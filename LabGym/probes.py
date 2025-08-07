@@ -127,7 +127,8 @@ def probes() -> None:
 
     # Report sw start and context to the central receiver.
     # if central_logger.disabled is True, no logrecord is created/sent.
-    central_logger.info(get_context(anonymous))
+    central_logger.info(get_context(anonymous))  # propagation: False
+    logger.info(get_context(anonymous))
 
 
 # PLACEHOLDER for moving this existing probe from __main__ to here.

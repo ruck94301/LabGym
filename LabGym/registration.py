@@ -379,7 +379,9 @@ def register(central_logger=None) -> None:
     except Exception as e:
         reginfo.update({'status': 'unable to save to regfile'})
 
-    central_logger.info(reginfo)
+    # if central_logger.disabled is True, no logrecord is created/sent.
+    central_logger.info(reginfo)  # propagation: False
+    logger.info(reginfo)
 
 
 # pylint: disable-next=redefined-outer-name

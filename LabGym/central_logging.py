@@ -150,7 +150,7 @@ def get_central_logger(http_handler_config=http_handler_config, reset=False):
     # Milestone -- logrecord handling is configured.
 
     central_logger.disabled = central_logger_disabled
-
+    central_logger.propagate = False
     central_logger.configured = True
 
     return central_logger
