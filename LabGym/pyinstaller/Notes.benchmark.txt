@@ -1,0 +1,19 @@
+To estimate a duration on a platform with Geekbench 6 value GB6, 
+multiply the reference duration, T_ref, by GB6_ref/GB6.
+
+For example, if an operation duration is reported as
+    5.1 min (@GB6=1889)
+or,
+    T_ref = 5.1 min (@GB6_ref=1889),
+that is, on a MacBook Air with 
+    (a) 2.2 GHz Dual-Core Intel Core i7, 
+    (b) 8GB RAM, 
+(having a Geekbench 6 of ~1889),
+
+Then an estimate of the duration on a 
+"MacBook Air (13-inch, 2025) with M4, Multi-Core" with GB6 of ~14830
+is
+    0.65 min = 5.1 min * (1889/14830)
+
+The choice of Geekbench 6 as a basis benchmark comes from a ChatGPT 
+recommendation 2025-09-03.

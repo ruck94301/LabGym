@@ -1,0 +1,22 @@
+Notes re using pyinstaller to compile, the packaging of the pyinstaller 
+output for installation, the installation, and the execution.
+
+Windows
+
+Linux
+
+MacOS
+    Compilation
+        sh pyinstaller.sh
+    Packaging
+        * drag the app-bundle into the image, not the Desktop folder that 
+          contains the app-bundle?
+    Upload/share
+    User download
+    Installation
+        * obtain the dmg-file (611 MB?)
+        * open it
+        * drag the app icon onto the Applications shortcut icon.
+          OR, drag the app icon onto your Desktop
+    Execution 
+        "Open" the LabGym Application.
