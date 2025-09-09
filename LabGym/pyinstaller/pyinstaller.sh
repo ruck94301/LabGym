@@ -7,6 +7,18 @@ OSNAME=$(uname -s)
 
 case $OSNAME in
     Darwin)
+
+        # 2025-09-09:
+        # *   pyinstaller step is taking 527 sec (=8.8 min) with add'l 
+        #     options
+
+        #     526965 INFO: Build complete! The results are available in: 
+        #     /Users/john/Public/LabGym/LabGym/pyinstaller/dist
+
+        #     real	8m48.697s
+        #     user	4m51.874s
+        #     sys	2m12.777s
+
         # 2025-09-03:
         # *   pyinstaller step is taking 293 sec (=4.9 min) (@GB6=1889)
         #     (John's MacBook Air)
@@ -53,15 +65,18 @@ case $OSNAME in
         #     You can add other items to the Info.plist by editing the
         #     spec file; see Spec File Options for a Mac OS X Bundle below.
 
+        set -e
         set -x
 
-        time pyinstaller --windowed \
-            --osx-bundle-identifier=yelab.LabGym \
-            --icon=sunflower.png \
-            \
-            --clean --name LabGym \
-            --add-data=../logging.yaml:LabGym --noconfirm myapp.py \
-            2>& 1 | tee pyinstaller.log
+        (
+            time pyinstaller --windowed \
+                --osx-bundle-identifier=yelab.LabGym \
+                --icon=sunflower.png \
+                \
+                --clean --name LabGym \
+                --collect-all LabGym.detectron2 \
+                --add-data=../logging.yaml:LabGym --noconfirm myapp.py
+        ) 2>& 1 | tee pyinstaller.log
 
         # % du -sh dist/*
         # 1.8G  dist/LabGym
