@@ -7,8 +7,17 @@ ERROR () { printf "ERROR\t%s\n" "$*" >& 2; }
 INFO () { printf "INFO\t%s\n" "$*" >& 2; }
 DEBUG () { printf "DEBUG\t%s\n" "$*" >& 2; }
 
+OPTS="$@"
+
 
 OSNAME=$(uname -s)
+
+# Determine if Rosetta is enabled by returning the exit status of an 
+# attempt to run x86_64 uname on arm64.
+IS_ROSETTA_ENABLED () {
+    [[ $(uname -m) = arm64 ]] || return  # return false on intel
+    arch -arch x86_64 uname > /dev/null 2>& 1
+}
 
 case $OSNAME in
     Darwin)
@@ -70,20 +79,28 @@ case $OSNAME in
         #     You can add other items to the Info.plist by editing the
         #     spec file; see Spec File Options for a Mac OS X Bundle below.
 
+        OPTS="$OPTS${OPTS:+ }--windowed"
+
+        if IS_ROSETTA_ENABLED; then
+            # supply PyInstaller option for making fat executable
+            OPTS="$OPTS${OPTS:+ }--target-architecture universal2"
+            OPTS="$OPTS${OPTS:+ }--name LabGym.universal2"
+        else
+            OPTS="$OPTS${OPTS:+ }--name LabGym.$(uname -m)"
+        fi
+
+        OPTS="$OPTS${OPTS:+ }--osx-bundle-identifier=yelab.LabGym"
+        OPTS="$OPTS${OPTS:+ }--icon=sunflower.png"
+        OPTS="$OPTS${OPTS:+ }--clean"
+        OPTS="$OPTS${OPTS:+ }--collect-all LabGym.detectron2"
+        OPTS="$OPTS${OPTS:+ }--add-data=../logging.yaml:LabGym"
+        OPTS="$OPTS${OPTS:+ }--noconfirm"
+
         set -e
         set -x
 
-        (
-            time pyinstaller \
-                --windowed \
-                "$@" \
-                --osx-bundle-identifier=yelab.LabGym \
-                --icon=sunflower.png \
-                \
-                --clean --name LabGym \
-                --collect-all LabGym.detectron2 \
-                --add-data=../logging.yaml:LabGym --noconfirm myapp.py
-        ) 2>& 1 | tee pyinstaller.log
+        (time pyinstaller $OPTS myapp.py) 2>& 1 | 
+        tee pyinstaller.log
 
         # % du -sh dist/*
         # 1.8G  dist/LabGym
