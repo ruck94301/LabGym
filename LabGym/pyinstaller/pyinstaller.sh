@@ -9,12 +9,12 @@ case $OSNAME in
     Darwin)
 
         # 2025-09-09:
-        # *   pyinstaller step is taking 527 sec (=8.8 min) with add'l 
+        # *   pyinstaller step is taking 527 sec (=8.8 min) with add'l
         #     options
-
-        #     526965 INFO: Build complete! The results are available in: 
+        #
+        #     526965 INFO: Build complete! The results are available in:
         #     /Users/john/Public/LabGym/LabGym/pyinstaller/dist
-
+        #
         #     real	8m48.697s
         #     user	4m51.874s
         #     sys	2m12.777s
@@ -69,7 +69,9 @@ case $OSNAME in
         set -x
 
         (
-            time pyinstaller --windowed \
+            time pyinstaller \
+                --windowed \
+                --target-architecture universal2 \
                 --osx-bundle-identifier=yelab.LabGym \
                 --icon=sunflower.png \
                 \
@@ -82,9 +84,9 @@ case $OSNAME in
         # 1.8G  dist/LabGym
         # 1.8G  dist/LabGym.app
 
-        # if you double-click on the sunflower LabGym.app, get LabGym 
+        # if you double-click on the sunflower LabGym.app, get LabGym
         # Verifying... (the first time only),
-        # then UI starts and its tray icon is sunflower.  But no console 
+        # then UI starts and its tray icon is sunflower.  But no console
         # for logging is created... can't see messages.  :-/
 
         # count the pyinstaller warnings
