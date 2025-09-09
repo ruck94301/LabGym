@@ -1,3 +1,8 @@
+# Examples
+#     sh pyinstaller.sh
+#
+#     sh pyinstaller.sh --target-architecture universal2
+
 ERROR () { printf "ERROR\t%s\n" "$*" >& 2; }
 INFO () { printf "INFO\t%s\n" "$*" >& 2; }
 DEBUG () { printf "DEBUG\t%s\n" "$*" >& 2; }
@@ -71,7 +76,7 @@ case $OSNAME in
         (
             time pyinstaller \
                 --windowed \
-                --target-architecture universal2 \
+                "$@" \
                 --osx-bundle-identifier=yelab.LabGym \
                 --icon=sunflower.png \
                 \
