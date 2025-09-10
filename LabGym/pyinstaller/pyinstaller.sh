@@ -1,9 +1,11 @@
-# Examples
+# Example
 #     sh pyinstaller.sh
 #
-#     sh pyinstaller.sh --target-architecture universal2
+# When run on MacOS, this script will by default produce universal2 
+# output if possible, or, warn and carry on to produce arm64 or x86_64.
 
 ERROR () { printf "ERROR\t%s\n" "$*" >& 2; }
+WARNING () { printf "WARNING\t%s\n" "$*" >& 2; }
 INFO () { printf "INFO\t%s\n" "$*" >& 2; }
 DEBUG () { printf "DEBUG\t%s\n" "$*" >& 2; }
 
@@ -13,11 +15,21 @@ OPTS="$@"
 OSNAME=$(uname -s)
 
 # Determine if Rosetta is enabled by returning the exit status of an 
-# attempt to run x86_64 uname on arm64.
+# attempt to run x86_64 flavor of uname on arm64.
 IS_ROSETTA_ENABLED () {
     [[ $(uname -m) = arm64 ]] || return  # return false on intel
     arch -arch x86_64 uname > /dev/null 2>& 1
 }
+
+# Determine if Python is universal2 -built, by inspecting file output.
+IS_PYTHON_UNIVERSAL () {
+    return $(file "$(which python)" | awk '
+            /x86_64/ {x86_64 = "true"}
+            /arm64/ {arm64 = "true"}
+            END {print !(x86_64 && arm64)}  # negate because in sh, true is 0
+        ')
+}
+
 
 case $OSNAME in
     Darwin)
@@ -81,9 +93,13 @@ case $OSNAME in
 
         OPTS="$OPTS${OPTS:+ }--windowed"
 
-        if IS_ROSETTA_ENABLED; then
+        # To produce universal2 output, (a) need M-series with Rosetta2
+        # and (b) Python must be universal2
+        if IS_ROSETTA_ENABLED && IS_PYTHON_UNIVERSAL; then
             # supply PyInstaller option for making fat executable
             OPTS="$OPTS${OPTS:+ }--target-architecture universal2"
+        else
+            WARNING "Can't produce universal2 output.  Producing architecture-specific output instead."
         fi
 
         OPTS="$OPTS${OPTS:+ }--name LabGym"
