@@ -84,11 +84,9 @@ case $OSNAME in
         if IS_ROSETTA_ENABLED; then
             # supply PyInstaller option for making fat executable
             OPTS="$OPTS${OPTS:+ }--target-architecture universal2"
-            OPTS="$OPTS${OPTS:+ }--name LabGym.universal2"
-        else
-            OPTS="$OPTS${OPTS:+ }--name LabGym.$(uname -m)"
         fi
 
+        OPTS="$OPTS${OPTS:+ }--name LabGym"
         OPTS="$OPTS${OPTS:+ }--osx-bundle-identifier=yelab.LabGym"
         OPTS="$OPTS${OPTS:+ }--icon=sunflower.png"
         OPTS="$OPTS${OPTS:+ }--clean"
@@ -102,7 +100,7 @@ case $OSNAME in
         (time pyinstaller $OPTS myapp.py) 2>& 1 | 
         tee pyinstaller.log
 
-        # % du -sh dist/*
+        du -sh dist/*
         # 1.8G  dist/LabGym
         # 1.8G  dist/LabGym.app
 
@@ -113,6 +111,8 @@ case $OSNAME in
 
         # count the pyinstaller warnings
         wc -l build/LabGym/warn-LabGym.txt
+
+        file dist/LabGym.app/Contents/MacOS/LabGym
 
         (
             date
