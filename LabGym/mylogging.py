@@ -103,6 +103,7 @@ Example 2, Log the loading of this module, and configure the logging system.
 from __future__ import annotations
 
 # Standard library imports.
+from contextlib import contextmanager
 import functools
 import inspect
 import logging.config
@@ -115,6 +116,7 @@ try:
     import tomllib  # type: ignore
 except ModuleNotFoundError:
     import tomli as tomllib  # A lil' TOML parser
+import time
 from typing import Dict, List
 
 # Related third party imports.
@@ -125,6 +127,45 @@ from LabGym import config
 
 
 logger = logging.getLogger(__name__)
+
+
+timer_depth = 0
+@contextmanager
+def Timer(description, logger=None):
+    """Report elapsed time upon context manager __exit__()."""
+
+    global timer_depth
+    try:
+        # logger.debug('%s', f'{description} (starting...)')
+
+        # prefix is a depth gauge, like '> ' for depth 1, '>> ' for depth 2
+        timer_depth += 1
+        prefix = f'{">" * timer_depth} '  # depth gauge prefix string
+
+        # manually prepare a logrecord with identifiers from the caller.
+        logrecord = logging.LogRecord(
+            level=logging.DEBUG,
+            msg='%s', 
+            args=(f'{prefix}{description} (starting...)',), 
+
+            lineno=inspect.stack()[2].lineno,
+            name=logger.name,
+            pathname=inspect.stack()[2].filename,
+            exc_info=None,
+            )
+        logger.handle(logrecord)  # handle the custom logrecord
+
+        T0 = time.perf_counter()
+        yield
+    finally:
+        T = time.perf_counter() - T0
+        logrecord = logging.makeLogRecord(logrecord.__dict__)
+        # logger.debug('%s', f'{description} (done.  T: {T:.1f} sec)')
+        logrecord.args = (f'{prefix}{description} (done.  T: {T:.1f} sec)',)
+        logger.handle(logrecord)  # handle the custom logrecord
+
+        timer_depth -= 1
+
 
 # In general or production use, module attributes raiseExceptions and
 # prehandle_logrecords should be False.
