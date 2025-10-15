@@ -36,12 +36,8 @@ import numpy as np
 import wx
 
 # Local application/library specific imports.
-logger.debug('importing %s ...', '.analyzebehavior')
 from .analyzebehavior import AnalyzeAnimal
-logger.debug('importing %s done', '.analyzebehavior')
-logger.debug('importing %s ...', '.analyzebehavior_dt')
 from .analyzebehavior_dt import AnalyzeAnimalDetector
-logger.debug('importing %s done', '.analyzebehavior_dt')
 from .categorizer import Categorizers
 from LabGym import config
 from .tools import sort_examples_from_csv

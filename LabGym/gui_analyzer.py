@@ -35,15 +35,13 @@ from .mylogging import Timer
 # Related third party imports.
 import matplotlib as mpl
 import pandas as pd
-import torch
 with Timer('import torch', logger=logger):
 	import torch
 import wx
 
 # Local application/library specific imports.
-from .analyzebehavior import AnalyzeAnimal
-from .analyzebehavior_dt import AnalyzeAnimalDetector
 with Timer('from .analyzebehavior import ...', logger=logger):
+	from .analyzebehavior import AnalyzeAnimal
 with Timer('from .analyzebehavior_dt import ...', logger=logger):
 	from .analyzebehavior_dt import AnalyzeAnimalDetector
 from LabGym import config  # pylint: disable=wrong-import-order
