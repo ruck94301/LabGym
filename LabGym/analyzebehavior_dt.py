@@ -22,9 +22,19 @@ from collections import deque
 import datetime
 import functools
 import gc
+import logging
 import math
 import operator
 import os
+
+# Log the load of this module (by the module loader, on first import).
+# Intentionally positioning these statements before other imports, against the
+# guidance of PEP-8, to log the load before other imports log messages.
+logger = logging.getLogger(__name__)
+logger.debug('loading %s', __file__)
+
+# Import the Timer context manager to support profiling blocks.
+from .mylogging import Timer
 
 # Related third party imports.
 import cv2
@@ -39,7 +49,8 @@ from keras.utils import img_to_array
 import torch
 
 # Local application/library specific imports.
-from .detector import Detector
+with Timer('from .detector import ...', logger=logger):
+	from .detector import Detector
 from .tools import (
 	crop_frame,
 	extract_blob_background,

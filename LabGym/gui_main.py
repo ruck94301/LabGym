@@ -20,13 +20,15 @@ Email: bingye@umich.edu
 # Standard library imports.
 import logging
 import sys
-from .gui_app_icon import set_frame_icon, setup_application_icons
 
 # Log the load of this module (by the module loader, on first import).
 # Intentionally positioning these statements before other imports, against the
 # guidance of PEP-8, to log the load before other imports log messages.
 logger =  logging.getLogger(__name__)  # pylint: disable=wrong-import-position
 logger.debug('loading %s', __file__)  # pylint: disable=wrong-import-position
+
+# Import the Timer context manager to support profiling blocks.
+from .mylogging import Timer
 
 # Related third party imports.
 import wx
@@ -35,15 +37,24 @@ import wx.lib.agw.hyperlink as hl
 
 # Local application/library specific imports.
 from LabGym import __version__
-from .gui_utils import add_or_select_notebook_page
-logger.debug('importing %s ...', '.gui_categorizer')
-from .gui_categorizer import PanelLv2_GenerateExamples,PanelLv2_TrainCategorizers,PanelLv2_SortBehaviors,PanelLv2_TestCategorizers
-logger.debug('importing %s done', '.gui_categorizer')
+with Timer('from .gui_analyzer import ...', logger=logger):
+	from .gui_analyzer import (
+		PanelLv2_AnalyzeBehaviors,
+		PanelLv2_CalculateDistances,
+		PanelLv2_MineResults,
+		PanelLv2_PlotBehaviors,
+		)
+from .gui_app_icon import set_frame_icon, setup_application_icons
+with Timer('from .gui_categorizer import ...', logger=logger):
+	from .gui_categorizer import (
+		PanelLv2_GenerateExamples,
+		PanelLv2_SortBehaviors,
+		PanelLv2_TestCategorizers,
+		PanelLv2_TrainCategorizers,
+		)
 from .gui_detector import PanelLv2_GenerateImages,PanelLv2_TrainDetectors,PanelLv2_TestDetectors
 from .gui_preprocessor import PanelLv2_ProcessVideos,PanelLv2_DrawMarkers
-from .gui_analyzer import PanelLv2_AnalyzeBehaviors,PanelLv2_MineResults,PanelLv2_PlotBehaviors,PanelLv2_CalculateDistances
-
-
+from .gui_utils import add_or_select_notebook_page
 
 
 class InitialPanel(wx.Panel):

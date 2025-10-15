@@ -33,28 +33,31 @@ import os
 logger =  logging.getLogger(__name__)  # pylint: disable=wrong-import-position
 logger.debug('loading %s', __file__)  # pylint: disable=wrong-import-position
 
+# Import the Timer context manager to support profiling blocks.
+from .mylogging import Timer
+
 # Related third party imports.
 import cv2
 import numpy as np
 import pandas as pd
 from scipy.spatial import distance
-import tensorflow as tf
+with Timer('import tensorflow', logger=logger):
+	import tensorflow as tf
 from tensorflow import keras  # pylint: disable=unused-import
 from keras.models import load_model
 from keras.utils import img_to_array
 
 # Local application/library specific imports.
-logger.debug('importing tools (starting...)')
-from .tools import (
-	estimate_constants,
-	crop_frame,
-	extract_blob_background,
-	extract_blob_all,
-	contour_frame,
-	generate_patternimage,
-	generate_patternimage_all,
-	)
-logger.debug('importing tools (done)')
+with Timer('from .tools import ...', logger=logger):
+	from .tools import (
+		estimate_constants,
+		crop_frame,
+		extract_blob_background,
+		extract_blob_all,
+		contour_frame,
+		generate_patternimage,
+		generate_patternimage_all,
+		)
 
 
 class AnalyzeAnimal():

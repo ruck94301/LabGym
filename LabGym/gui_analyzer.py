@@ -29,16 +29,24 @@ from pathlib import Path
 logger =  logging.getLogger(__name__)  # pylint: disable=wrong-import-position
 logger.debug('loading %s', __file__)  # pylint: disable=wrong-import-position
 
+# Import the Timer context manager to support profiling blocks.
+from .mylogging import Timer
+
 # Related third party imports.
 import matplotlib as mpl
 import pandas as pd
 import torch
+with Timer('import torch', logger=logger):
+	import torch
 import wx
 
 # Local application/library specific imports.
 from .analyzebehavior import AnalyzeAnimal
 from .analyzebehavior_dt import AnalyzeAnimalDetector
-from LabGym import config
+with Timer('from .analyzebehavior import ...', logger=logger):
+with Timer('from .analyzebehavior_dt import ...', logger=logger):
+	from .analyzebehavior_dt import AnalyzeAnimalDetector
+from LabGym import config  # pylint: disable=wrong-import-order
 from .minedata import data_mining
 from .tools import plot_events, parse_all_events_file, calculate_distances
 

@@ -19,11 +19,23 @@ Email: bingye@umich.edu
 
 # Standard library imports.
 import json
+import logging
 import os
+
+# Log the load of this module (by the module loader, on first import).
+# Intentionally positioning these statements before other imports, against the
+# guidance of PEP-8, to log the load before other imports log messages.
+logger = logging.getLogger(__name__)
+logger.debug('loading %s', __file__)
+
+# Import the Timer context manager to support profiling blocks.
+from .mylogging import Timer
 
 # Related third party imports.
 import cv2
-from .detectron2 import model_zoo
+# local copy of detectron2 ("platform for ... visual recognition tasks")
+with Timer('from .detectron2 import ...', logger=logger):
+	from .detectron2 import model_zoo
 from .detectron2.checkpoint import DetectionCheckpointer
 from .detectron2.config import get_cfg
 from .detectron2.data import MetadataCatalog,DatasetCatalog,build_detection_test_loader

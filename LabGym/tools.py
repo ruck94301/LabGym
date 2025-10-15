@@ -34,20 +34,23 @@ import shutil
 logger =  logging.getLogger(__name__)  # pylint: disable=wrong-import-position
 logger.debug('loading %s', __file__)  # pylint: disable=wrong-import-position
 
+# Import the Timer context manager to support profiling blocks.
+from .mylogging import Timer
+
 # Related third party imports.
 import cv2
 from matplotlib.colorbar import ColorbarBase
 from matplotlib.colors import LinearSegmentedColormap,Normalize
-import matplotlib.pyplot as plt
+with Timer('import matplotlib.pyplot', logger=logger):
+	import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from PIL import Image,ImageEnhance
-import seaborn as sb
+with Timer('import seaborn', logger=logger):
+	import seaborn as sb
 from skimage import exposure
-logger.debug('importing tensorflow.keras.preprocessing.image (starting...)')
 from tensorflow import keras  # pylint: disable=unused-import
 from keras.utils import img_to_array
-logger.debug('importing tensorflow.keras.preprocessing.image (done)')
 
 # Local application/library specific imports.
 # (none)

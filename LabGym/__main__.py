@@ -44,6 +44,9 @@ mylogging.configure()
 # pylint: enable=wrong-import-position
 # block end
 
+# Import the Timer context manager to support profiling blocks.
+from .mylogging import Timer
+
 # Related third party imports.
 from packaging import version  # Core utilities for Python packages
 import requests  # Python HTTP for Humans.
@@ -51,7 +54,10 @@ import requests  # Python HTTP for Humans.
 # Local application/library specific imports.
 # pylint: disable-next=unused-import
 from LabGym import mypkg_resources  # replace deprecated pkg_resources
-from LabGym import __version__, gui_main, probes
+from LabGym import __version__
+with Timer('from LabGym import gui_main', logger=logger):
+	from LabGym import gui_main
+from LabGym import probes
 
 
 logger.debug('%s: %r', '(__name__, __package__)', (__name__, __package__))
