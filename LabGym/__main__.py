@@ -57,6 +57,7 @@ from LabGym import mypkg_resources  # replace deprecated pkg_resources
 from LabGym import __version__
 with Timer('from LabGym import gui_main', logger=logger):
 	from LabGym import gui_main
+from LabGym import mywx
 from LabGym import probes
 
 
@@ -88,6 +89,10 @@ def main() -> None:
 	except:
 
 		pass
+
+	# Create a single persistent, wx.App instance, as it may be
+        # needed for probe dialogs prior to calling gui_main.main_window.
+	mywx.App()
 
 	# Perform some pre-op sanity checks and probes of outside resources.
 	probes.probes()
