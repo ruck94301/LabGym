@@ -1,4 +1,3 @@
-# pylint: disable=line-too-long
 '''
 Copyright (C)
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -19,19 +18,19 @@ Email: bingye@umich.edu
 
 
 # noqa
-# pylint: enable=line-too-long
 
 # Standard library imports.
 import logging
 from pathlib import Path
+import sys
 
-# block begin
+# Regarding the use of logging and mylogging functions before the
+# "Related third party imports." section:
 # These statements are intentionally positioned before this module's
 # other imports (against the guidance of PEP 8), to log the loading of
 # this module before other import statements are executed and
 # potentially produce their own log messages.
-# pylint: disable=wrong-import-position
-from LabGym import mylogging  # pylint: disable=ungrouped-imports
+from LabGym import mylogging
 # Collect logrecords and defer handling until logging is configured.
 mylogging.defer()
 
@@ -43,8 +42,6 @@ logger.debug('%s', f'loading {__name__}')
 
 # Configure logging based on configfile, then handle collected logrecords.
 mylogging.configure()
-# pylint: enable=wrong-import-position
-# block end
 
 # Import the Timer context manager to support profiling blocks.
 from .mylogging import Timer
@@ -56,13 +53,14 @@ from LabGym import mywx  # on load, monkeypatch wx.App to be a strict-singleton
 import wx  # wxPython, Cross platform GUI toolkit for Python, "Phoenix" version
 
 # Local application/library specific imports.
+# pylint: disable=ungrouped-imports
 # pylint: disable-next=unused-import
 from LabGym import mypkg_resources  # replace deprecated pkg_resources
 from LabGym import __version__
 with Timer('from LabGym import gui_main', logger=logger):
 	from LabGym import gui_main
-from LabGym import mywx
 from LabGym import probes
+from LabGym import config, selftest
 
 
 logger.debug('%s: %r', '(__name__, __package__)', (__name__, __package__))
@@ -70,6 +68,17 @@ logger.debug('%s: %r', '(__name__, __package__)', (__name__, __package__))
 
 def main() -> None:
 	"""Perform some pre-op probing, then display the main window."""
+
+	# Get all of the values needed from config.get_config().
+	flag_selftest: bool = config.get_config()['selftest']
+
+	if flag_selftest:
+		logger.info('%s -- %s', 'run_selftests()', 'calling...')
+		result = selftest.run_selftests()
+		logger.info('%s -- %s', 'run_selftests()', f'returned {result!r}')
+		logger.info('%s -- %s', f'sys.exit({result!r})', 'calling...')
+		sys.exit(result)
+
 
 	try:
 
