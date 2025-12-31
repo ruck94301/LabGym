@@ -133,30 +133,38 @@ def Timer(description, logger=None):
 	"""Report elapsed time upon context manager __exit__()."""
 
 	global timer_depth
+
 	try:
-		# logger.debug('%s', f'{description} (starting...)')
+		T_setup_0 = time.perf_counter()
 
 		# prefix is a depth gauge, like '> ' for depth 1, '>> ' for depth 2
 		timer_depth += 1
 		prefix = f'{">" * timer_depth} '  # depth gauge prefix string
 
+		frame = inspect.stack()[2]  # this is time-consuming :-/
+
 		# kwargs with lineno and pathname values from the caller
 		logrecord_kwargs = {
 			'level': logging.DEBUG,
 			'msg': '%s',
-			'lineno': inspect.stack()[2].lineno,
+			'lineno': frame.lineno,
 			'name': logger.name,
-			'pathname': inspect.stack()[2].filename,
+			'pathname': frame.filename,
 			'exc_info': None,
 			}
 
+		T_setup = time.perf_counter() - T_setup_0
+
 		# Prepare a custom logrecord and handle it.
 		logrecord = logging.LogRecord(**logrecord_kwargs,
-			args=(f'{prefix}{description} (starting...)',))
+			# args=(f'{prefix}{description} (starting...)',))
+			args=(f'{prefix}{description} (starting...)'
+				f' (after Timer setup: {T_setup:.1f} sec)',))
 		logger.handle(logrecord)
 
 		T0 = time.perf_counter()
 		yield
+
 	finally:
 		T = time.perf_counter() - T0  # elapsed time
 
