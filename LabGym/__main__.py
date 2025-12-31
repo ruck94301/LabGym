@@ -44,7 +44,7 @@ logger.debug('%s', f'loading {__name__}')
 mylogging.configure()
 
 # Import the Timer context manager to support profiling blocks.
-from .mylogging import Timer
+from .mylogging import Timer  # pylint: disable=wrong-import-order
 
 # Related third party imports.
 from packaging import version  # Core utilities for Python packages

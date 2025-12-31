@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 logger.debug('loading %s', __file__)
 
 # Import the Timer context manager to support profiling blocks.
-from .mylogging import Timer
+from .mylogging import Timer  # pylint: disable=wrong-import-order
 
 # Related third party imports.
 import cv2
