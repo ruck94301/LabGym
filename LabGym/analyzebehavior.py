@@ -43,9 +43,12 @@ import pandas as pd
 from scipy.spatial import distance
 with Timer('import tensorflow', logger=logger):
 	import tensorflow as tf
-from tensorflow import keras  # pylint: disable=unused-import
-from keras.models import load_model
-from keras.utils import img_to_array
+with Timer('from tensorflow import ...', logger=logger):
+	from tensorflow import keras  # pylint: disable=unused-import
+with Timer('from keras.models import ...', logger=logger):
+	from keras.models import load_model
+with Timer('from keras.utils import ...', logger=logger):
+	from keras.utils import img_to_array
 
 # Local application/library specific imports.
 with Timer('from .tools import ...', logger=logger):

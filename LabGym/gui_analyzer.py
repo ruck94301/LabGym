@@ -33,8 +33,10 @@ logger.debug('loading %s', __file__)
 from .mylogging import Timer
 
 # Related third party imports.
-import matplotlib as mpl
-import pandas as pd
+with Timer('import matplotlib', logger=logger):
+	import matplotlib as mpl
+with Timer('import pandas', logger=logger):
+	import pandas as pd
 with Timer('import torch', logger=logger):
 	import torch
 import wx
