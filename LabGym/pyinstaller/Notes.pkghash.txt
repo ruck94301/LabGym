@@ -1,0 +1,21 @@
+The LabGym.pkghash package is written to walk the LabGym tree for 
+py-files and produce a hash, and look up that hash in versions.toml.
+
+But in a pyinstaller build,
+*   no py-files are located, so the hash is d41d... because 0 bytes.
+*   versions.toml isn't included in the build by default.
+
+For inspiration re storing a fixed hash when compiling with pyinstaller,
+see 
+*   https://www.google.com/search?q=python+to+test+if+current+program+is+being+run+from+python+interpreter+or+from+pyinstaller+build
+*   https://github.com/pyinstaller/pyinstaller/issues/1818#
+*   https://gist.github.com/JarekParal/24e15de33971674a8c0f9955f6ad15e0
+
+DEBUG	[hash:107]	hashval: 'd41d8cd98f00b204e9800998ecf8427e'
+DEBUG	[lookup:99]	version_with_longhash: '2.9.6 (d41d8cd98f00b204e9800998ecf8427e)'
+DEBUG	[lookup:109]	result: '2.9.6 (d41d8cd98f00b204e9800998ecf8427e)'
+INFO	[probes:129]	{'schema': 'context 2025-08-10', 'python_version': '3.10.11', 'version': '2.9.6 (d41d8cd98f00b204e9800998ecf8427e)'}
+DEBUG	[lookup:99]	version_with_longhash: '2.9.6 (d41d8cd98f00b204e9800998ecf8427e)'
+WARNING	[lookup:76]	Trouble reading /Users/john/LabGymRepo/LabGym/pyinstaller/dist/LabGym/_internal/LabGym/pkghash/versions.toml.  [Errno 2] No such file or directory: '/Users/john/LabGymRepo/LabGym/pyinstaller/dist/LabGym/_internal/LabGym/pkghash/versions.toml'
+DEBUG	[lookup:79]	known_versions: []
+DEBUG	[lookup:109]	result: '2.9.6 (d41d)'
