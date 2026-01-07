@@ -1,16 +1,32 @@
+# This script 
+#  *  provides add'l config for standard pylint
+#  *  expects to be run in a venv with pylint
+#  *  expects to be run from LabGym/tests
+#  *  writes resultant report-files under tmp.pylint
+#
 # Examples
-#   # Run pylint with custom options on ../*.py.
+#   # Run pylint with custom options on ../*.py and subpackage py-files.
 #   sh pylint.sh
 #
-#   # Run pylint with custom options on two files.
-#   sh pylint.sh ../categorizer.py ../detector.py
+#   # Run pylint with custom options on two py-files and a (sub)package.
+#   sh pylint.sh ../categorizer.py ../detector.py ../mywx
 #
 #   # Don't run pylint... just summarize existing results in tmp.pylint.
 #   sh pylint.sh --summarize
 
 source INIT.sh
 
-PYFILES=$(echo ../*.py ../mywx/*.py)
+LIST_SUBPACKAGES () {
+    find .. -mindepth 1 -maxdepth 1 -type d -print |
+    egrep -v "^\.\./(detectors|models|detectron2|tests)$" |
+    while read D; do
+        [ -f "$D"/__init__.py ] && echo "$D"
+    done
+}
+
+PYFILES=$({ echo ../*.py
+    for P in $(LIST_SUBPACKAGES); do echo $P/*.py; done
+    } | sed "s/ /\n/g" | sort)
 
 OP=pylint  # default OP
 while [ $# -gt 0 ]; do
@@ -44,6 +60,8 @@ OPTS="--rcfile pylintrc"
 setopt SH_WORD_SPLIT 2> /dev/null
 
 for F in $PYFILES; do
+    # echo $F; continue
+
     OUTFILE=$OUTDIR/pylint.$(echo $F | tr / . | sed "s/^\.\.\.//").out
 
     # (set -x; pylint $OPTS $F > $OUTFILE)
@@ -56,20 +74,65 @@ done
     ;;
 
     summarize)
-    # Don't run pylint... just summarize existing results in tmp.pylint.
 #-----------------------------------------------------------------------
+# Don't run pylint... 
+# Summarize existing pylint report files stored under tmp.pylint.
+
 [ $# -eq 0 ] || { ERROR "Bad usage.  \$#: $#"; exit 1; }
 
-(cd tmp.pylint && grep -n "Your code has been rated at" *.out) |
+# (cd tmp.pylint && grep -n "Your code has been rated at" *.out) |
+#
+# sed \
+#     -e "s/^pylint\.//" \
+#     -e "s/ (previous run: .*//" \
+#     -e "s/\(.*.py\).out:\([0-9]*\):/\1\t\2\t/" \
+#     -e "s/Your code has been rated at //" |
+#
+# # print rating, number of messages (assuming N-3), filename
+# AWK -F"\t" 'BEGIN {OFS = "\t"}; {print $3, $2-3, $1}' |
 
-sed \
-    -e "s/^pylint\.//" \
-    -e "s/ (previous run: .*//" \
-    -e "s/\(.*.py\).out:\([0-9]*\):/\1\t\2\t/" \
-    -e "s/Your code has been rated at //" |
+(
+    set -e
+    cd tmp.pylint
+    for F in *.out; do
+        AWK -F: '
+            BEGIN {
+                OFS = "\t"
+                count = 0
+            }
 
-# print rating, number of messages (assuming N-3), filename
-AWK -F"\t" 'BEGIN {OFS = "\t"}; {print $3, $2-3, $1}' |
+            NF >= 5 {
+                # lines with 5 ":"-separated fields are pylint "observations"
+                count += 1
+                next
+            }
+
+            /^Your code has been rated at/ {
+                # pylint output is completed
+
+                split($0, tokens, " ")
+                rating = tokens[7]
+
+                buf = FILENAME
+                sub("^pylint\.", "", buf)
+                sub("\.out$", "", buf)
+
+                print rating, count, buf
+                next
+            }
+
+            {
+                # disregard line separators
+                if ($0 ~ /^$/) {next}
+                else if ($0 ~ /^--------/) {next}
+                else if ($0 ~ /^\*\*\*\*\*\*\*\*/) {next}
+                else {
+                    print "unexpected: " $0
+                }
+            }
+            ' $F
+    done
+) |
 
 expand -10,16 |
 cat -n
