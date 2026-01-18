@@ -236,7 +236,8 @@ class PanelLv2_TrainDetectors(wx.Panel):
 		self.notebook = parent
 
 		# Get all of the values needed from config.get_config().
-		self.config = config.get_config('detectors')
+		self.config: Dict[str, str] = config.get_config('detectors')
+
 
 		self.path_to_trainingimages=None # the folder that stores all the training images
 		self.path_to_annotation=None # the path to the .json file that stores the annotations in coco format
@@ -403,7 +404,7 @@ class PanelLv2_TestDetectors(wx.Panel):
 		self.notebook = parent
 
 		# Get all of the values needed from config.get_config().
-		self.config = config.get_config('detectors')
+		self.config: Dict[str, str] = config.get_config('detectors')
 
 		self.path_to_testingimages=None # the folder that stores all the testing images
 		self.path_to_annotation=None # the path to the .json file that stores the annotations in coco format

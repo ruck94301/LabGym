@@ -133,7 +133,7 @@ logger = logging.getLogger(__name__)
 raiseExceptions = False
 prehandle_logrecords = False
 
-development_mode = False
+development_mode = True
 if development_mode:
 	# Defeat the suppression of exceptions.
 	raiseExceptions = True  # for development only
@@ -182,16 +182,24 @@ def _mydebug(myobj: str | Exception) -> logging.LogRecord:
 	return _myLogRecord(myobj, level=logging.DEBUG)
 
 
-def get_configdict_from_configfile(configfile: Path) -> Dict:
-	"""Read the configfile and return the config dictionary."""
-	if configfile.name.endswith('.toml'):
+def get_configdict_from_configfile(configfilestr: str) -> Dict:
+	"""Read the logging configfile and return the logging config dictionary."""
+
+	# inside this function, configfile is a Path object
+	configfile = Path(configfilestr)
+
+	extension = configfile.suffix
+
+	if extension == '.toml':
 		with open(configfile, 'rb') as f:
 			result = tomllib.load(f)
-	elif configfile.name.endswith('.yaml'):
+	elif extension in ['.yaml', '.yml']:
 		with open(configfile, 'r', encoding='utf-8') as f:
 			result = yaml.safe_load(f)
 	else:
-		raise Exception(f'bad extension.  configfile: {configfile}')
+		msg = ('Unsupported configfile extension.'
+			f'  configfile: {str(configfile)!r}')
+		raise ValueError(msg)
 
 	return result
 
@@ -228,7 +236,8 @@ def catch_exceptions_and_warn(wrappee):
 @catch_exceptions_and_warn  # Guard from exceptions.
 def configure() -> None:
 	"""
-	Configure logging based on configfile, then handle deferred logrecords.
+	Configure logging based on logging configfile, then handle deferred
+	logrecords.
 
 	(1) Configure the logging system based on settings from a configfile.
 	(2) Honor command-line args that override the root logger level.
@@ -248,11 +257,23 @@ def configure() -> None:
 	try:
 		defer()  # Ensure logrecords are being queued.
 
-		# (1) Get all of the values needed from config.get_config().
+		# Get all of the values needed from config.get_config().
 		_config = config.get_config()
-		logging_configfiles: List[Path] = _config['logging_configfiles']
-		logging_configfile: Path|None = _config.get('logging_configfile')
+		_logging_configfiles: List[Path|str] = _config.get('logging_configfiles')
+		_logging_configfile: Path|str|None = _config.get('logging_configfile')
 		logging_level: str|None = _config.get('logging_level')
+		del _config
+
+		# coerce values to Path, from str or Path
+		logging_configfiles: List[Path] = [Path(item) for item in _logging_configfiles]
+		# coerce value to Path, from str or Path
+		logging_configfile: Path|None = Path(_logging_configfile) if _logging_configfile is not None else None
+
+		# if 'logging_configfile' in _config.keys():
+		#     logging_configfile = Path(_config.get('logging_configfile'))
+		# else:
+		#     logging_configfile = None
+
 
 		# Copy the queued logrecords to a list, and switch over to
 		# manual logrecord creation until configuring is completed.

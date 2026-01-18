@@ -64,7 +64,7 @@ def main() -> None:
 	"""Perform some pre-op probing, then display the main window."""
 
 	# Get all of the values needed from config.get_config().
-	flag_selftest: bool = config.get_config()['selftest']
+	flag_selftest: bool = config.get_config('selftest')['selftest']
 
 	if flag_selftest:
 		logger.info('%s -- %s', 'run_selftests()', 'calling...')

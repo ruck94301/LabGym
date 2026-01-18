@@ -368,7 +368,8 @@ def _store_reginfo_to_file(reginfo: dict) -> None:
 	"""
 
 	# Get all of the values needed from config.get_config().
-	configdir: Path = config.get_config()['configdir']
+	# Inside this function, configdir is a Path object
+	configdir: Path = Path(config.get_config('configdir')['configdir'])
 
 	# ensure configdir exists
 	configdir.mkdir(parents=True, exist_ok=True)
@@ -383,7 +384,8 @@ def get_reginfo_from_file() -> dict | None:
 	"""Load registration info from file, and return reginfo."""
 
 	# Get all of the values needed from config.get_config().
-	configdir: Path = config.get_config()['configdir']
+	# Inside this function, configdir is a Path object
+	configdir: Path = Path(config.get_config('configdir')['configdir'])
 
 	# read reginfo file
 	regfile = configdir.joinpath('registration.yaml')

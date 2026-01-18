@@ -8,16 +8,19 @@ from LabGym import central_logging
 # from .exitstatus import exitstatus
 
 
-# basicConfig here isn't effective, maybe pytest has already configured logging?
-# instead, use the root logger's setLevel method
-logging.getLogger().setLevel(logging.DEBUG)
+def myraise(e):
+	"""Raise exception.  This form is useful in a lambda."""
+	raise e
 
 
 # success cases
 def test_enable_true(monkeypatch):
 	# Arrange
 	_config = {'enable': {'central_logger': True}}
-	monkeypatch.setattr(central_logging.config, 'get_config', lambda: _config)
+	monkeypatch.setattr(central_logging.config, 'get_config',
+		# lambda *args: _config)
+		lambda *args: _config if set(args) == {  # with arg check
+			'enable', } else myraise(Exception('mismatch')))
 	logging.debug('%s: %r', '_config', _config)
 
 	# Act

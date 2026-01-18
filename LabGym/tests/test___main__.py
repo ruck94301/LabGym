@@ -42,7 +42,7 @@ def test_main(monkeypatch):
 	monkeypatch.setattr(__main__.wx, 'GetApp', lambda: None)
 	monkeypatch.setattr(__main__.wx, 'App', lambda: None)
 
-	monkeypatch.setattr(__main__.config, 'get_config', lambda: {'selftest': False})
+	monkeypatch.setattr(__main__.config, 'get_config', lambda *args: {'selftest': False})
 
 	# Act
 	__main__.main()
@@ -70,7 +70,7 @@ def test_main_current_labgym(monkeypatch):
 	monkeypatch.setattr(__main__.wx, 'GetApp', lambda: None)
 	monkeypatch.setattr(__main__.wx, 'App', lambda: None)
 
-	monkeypatch.setattr(__main__.config, 'get_config', lambda: {'selftest': False})
+	monkeypatch.setattr(__main__.config, 'get_config', lambda *args: {'selftest': False})
 
 	# Act
 	__main__.main()
@@ -98,7 +98,7 @@ def test_main_stale_labgym(monkeypatch):
 	monkeypatch.setattr(__main__.wx, 'GetApp', lambda: None)
 	monkeypatch.setattr(__main__.wx, 'App', lambda: None)
 
-	monkeypatch.setattr(__main__.config, 'get_config', lambda: {'selftest': False})
+	monkeypatch.setattr(__main__.config, 'get_config', lambda *args: {'selftest': False})
 
 	# Act
 	__main__.main()

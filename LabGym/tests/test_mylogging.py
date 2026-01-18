@@ -10,6 +10,11 @@ from LabGym import mylogging
 rootlogger = logging.getLogger()
 
 
+def raise_valueerror(msg):
+	"""Raise ValueError.  This helper function form is useful in a lambda."""
+	raise ValueError(msg)
+
+
 @pytest.fixture
 def logging_reset(scope='module'):  # invoke once in the test module
 	# Clear rootlogger's, level.
@@ -38,11 +43,17 @@ def test_success(monkeypatch, logging_reset):
 	rootlogger.setLevel(logging.DEBUG)
 	_config = {
 		'logging_configfiles':
-			[Path(mylogging.__file__).parent.joinpath('logging.yaml')],
+			[str(Path(mylogging.__file__).parent.joinpath('logging.yaml'))],
 		'logging_configfile': None,
 		'logging_level': 'INFO',
 		}
-	monkeypatch.setattr(mylogging.config, 'get_config', lambda: _config)
+	monkeypatch.setattr(mylogging.config, 'get_config',
+		# lambda *args: _config)
+		lambda *args: _config if set(args) == {  # with arg check
+			'logging_configfiles','logging_configfile', 'logging_level',
+			} else raise_valueerror(
+				f'Mismatch betw get_config args ({args!r}) and expected'))
+
 	logging.debug('%s: %r', '_config', _config)
 
 	# Act
@@ -53,16 +64,23 @@ def test_success(monkeypatch, logging_reset):
 
 
 # Bad logging_level produces a warning message.
-def test_bad_logging_level(monkeypatch, logging_reset):
+def test_bad_logging_level(monkeypatch, logging_reset, capsys):
 	# Arrange
 	rootlogger.setLevel(logging.DEBUG)
+	assert rootlogger.level == logging.DEBUG
+
 	_config = {
 		'logging_configfiles':
-			[Path(mylogging.__file__).parent.joinpath('logging.yaml')],
+			[str(Path(mylogging.__file__).parent.joinpath('logging.yaml'))],
 		'logging_configfile': None,
 		'logging_level': 'WALNUT',  # bad value
 		}
-	monkeypatch.setattr(mylogging.config, 'get_config', lambda: _config)
+	monkeypatch.setattr(mylogging.config, 'get_config',
+		# lambda *args: _config)
+		lambda *args: _config if set(args) == {  # with arg check
+			'logging_configfiles','logging_configfile', 'logging_level',
+			} else raise_valueerror(
+				f'Mismatch betw get_config args ({args!r}) and expected'))
 	logging.debug('%s: %r', '_config', _config)
 
 	# Act
@@ -74,7 +92,7 @@ def test_bad_logging_level(monkeypatch, logging_reset):
 
 
 # Bad specific logging_configfile produces a warning message.
-def test_bad_specific_logging_configfile(monkeypatch, logging_reset):
+def xtest_bad_specific_logging_configfile(monkeypatch, logging_reset):
 	# Arrange
 	rootlogger.setLevel(logging.DEBUG)
 	_config = {

@@ -9,6 +9,7 @@ from packaging import version
 import pytest  # pytest: simple powerful testing with Python
 
 from LabGym import probes
+from LabGym import config
 from .exitstatus import exitstatus
 
 
@@ -31,7 +32,8 @@ logger = logging.getLogger(__name__)
 #     logging.debug('%s: %r', "os.getenv('PYTHONPATH')", os.getenv('PYTHONPATH'))
 
 
-def test_probes(monkeypatch, tmp_path):
+def test_probes(monkeypatch, tmp_path, capsys):
+  with capsys.disabled():
 	# Arrange
 	_config = {
 		'anonymous': True,
@@ -46,11 +48,11 @@ def test_probes(monkeypatch, tmp_path):
 	_config.update({'detectors': _detectors, 'models': _models})
 	logging.debug('%s: %r', '_config', _config)
 
-	monkeypatch.setattr(probes.config, 'get_config', lambda: _config)
-	logging.debug('%s: %r', '_config', _config)
-	monkeypatch.setattr(probes.central_logging.config, 'get_config', lambda: _config)
+	monkeypatch.setattr(config, 'get_fullconfig',
+		lambda *args: _config)
 
-	monkeypatch.setattr(probes.userdata_survey, 'survey', lambda *args, **kwargs: None)
+	monkeypatch.setattr(probes.userdata_survey, 'survey',
+		lambda *args, **kwargs: None)
 
 	# Act
 	probes.probes()

@@ -85,7 +85,7 @@ class PanelLv2_AnalyzeBehaviors(wx.Panel):
 		self.notebook = parent
 
 		# Get all of the values needed from config.get_config().
-		self.config = config.get_config('detectors', 'models')
+		self.config: Dict[str, str] = config.get_config('detectors', 'models')
 
 		self.behavior_mode=0 # 0--non-interactive, 1--interactive basic, 2--interactive advanced, 3--static images
 		self.use_detector=False # whether the Detector is used

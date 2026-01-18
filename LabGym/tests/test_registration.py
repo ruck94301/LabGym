@@ -161,7 +161,7 @@ def test__get_reginfo_from_form(monkeypatch, wx_app, tmp_path):
 	_config = {
 		'configdir': tmp_path,
 		}
-	monkeypatch.setattr(registration.config, 'get_config', lambda: _config)
+	monkeypatch.setattr(registration.config, 'get_config', lambda *args: _config)
 	logging.debug('%s: %r', '_config', _config)
 
 	registration.register(logging.getLogger())
@@ -184,7 +184,7 @@ def test_get_reginfo_from_file(monkeypatch):
 	_config = {
 		'configdir': testdir,
 		}
-	monkeypatch.setattr(registration.config, 'get_config', lambda: _config)
+	monkeypatch.setattr(registration.config, 'get_config', lambda *args: _config)
 	logging.debug('%s: %r', '_config', _config)
 
 	# Act
@@ -198,7 +198,7 @@ def test_is_registered(monkeypatch, tmp_path):
 	_config = {
 		'configdir': tmp_path,
 		}
-	monkeypatch.setattr(registration.config, 'get_config', lambda: _config)
+	monkeypatch.setattr(registration.config, 'get_config', lambda *args: _config)
 	logging.debug('%s: %r', '_config', _config)
 
 	# Act

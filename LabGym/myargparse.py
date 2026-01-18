@@ -28,21 +28,16 @@ from typing import Dict, List, Union
 
 # Local application/library specific imports.
 from LabGym import __version__, pkghash
+# This
+#     from .config import CustomConfigType  # type alias
+# needs refactoring, because it produces
+# ImportError: cannot import name 'CustomConfigType' from partially
+# initialized module 'LabGym.config' (most likely due to a circular
+# import) (.../LabGym/config.py)
 
 
-# result is a dict with keys that are string, and vals that are
-# string or bool or a dict of str,bool items.
-ResultType = Dict[str, Union[
-	# Path,  # configdir, configfile, logging_configfile (specific)
-	str,  # configdir, configfile, logging_configfile (specific)
-	# List[Path], # logging_configfiles (potentials)
-	List[str], # logging_configfiles (potentials)
-	str,  # logging_level
-	bool,  # anonymous
-	Dict[str, bool],  # enable
-	]]
-
-def parse_args() -> ResultType:
+# def parse_args() -> CustomConfigType:
+def parse_args() -> dict:
 	"""Parse command-line args and return a dict.
 
 	If the help option is encountered, print the help message and
@@ -109,7 +104,7 @@ def parse_args() -> ResultType:
 		  --version             Show the LabGym version and exit.
 		""")
 
-	result: ResultType = {}
+	result: CustomConfigType = {}
 
 	while len(args) > 0:
 		arg = args[0]

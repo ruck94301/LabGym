@@ -60,7 +60,8 @@ class PanelLv2_GenerateExamples(wx.Panel):
 		self.notebook = parent
 
 		# Get all of the values needed from config.get_config().
-		self.config = config.get_config('detectors', 'models')
+		self.config: Dict[str, str] = config.get_config('detectors', 'models')
+
 
 		self.behavior_mode=0 # 0: non-interactive behavior; 1: interact basic; 2: interact advanced; 3: static images
 		self.use_detector=False # whether the Detector is used
@@ -1075,7 +1076,8 @@ class PanelLv2_TrainCategorizers(wx.Panel):
 		self.notebook = parent
 
 		# Get all of the values needed from config.get_config().
-		self.config = config.get_config('models')
+		self.config: Dict[str, str] = config.get_config('models')
+
 
 		self.file_path=None # the folder that stores sorted, unprepared behavior examples (each category is a subfolder)
 		self.new_path=None # the folder that stores prepared behavior examples (contains all examples with a category tag in their names)
@@ -1610,7 +1612,8 @@ class PanelLv2_TestCategorizers(wx.Panel):
 		self.notebook = parent
 
 		# Get all of the values needed from config.get_config().
-		self.config = config.get_config('models')
+		self.config: Dict[str, str] = config.get_config('models')
+
 
 		self.file_path=None # the folder that stores the ground-truth examples (each subfolder is a behavior category)
 		self.model_path = self.config['models']  # the 'LabGym/models' folder, which stores all the trained Categorizers
