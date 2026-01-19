@@ -92,7 +92,7 @@ def test_patched_wx_app_charlie(wx_app):
 	assert app == wx.GetApp()
 
 
-def test_OK_Dialog_with_OK(wx_app):
+def test_OK_Dialog_with_OK(wx_app, delay_multiplier):
 	"""Show an OK_Dialog, press OK, and get OK."""
 	# Arrange
 	app = wx_app
@@ -111,7 +111,7 @@ def test_OK_Dialog_with_OK(wx_app):
 	# CallAfter is a function used to schedule a callable to be executed
 	# on the main GUI thread after the current event hander and any
 	# pending event handlers have completed.
-	wx.CallLater(1000 * 4, click_OK)
+	wx.CallLater(int(1000 * delay_multiplier), click_OK)
 
 	# The ShowModal() method is used to display a dialog box in a
 	# "modal" fashion.  When a modal dialog is shown, it blocks user
@@ -126,7 +126,7 @@ def test_OK_Dialog_with_OK(wx_app):
 	dialog.Destroy()  # request the dialog to self-destruct
 
 
-def test_OK_Dialog_with_Close(wx_app):
+def test_OK_Dialog_with_Close(wx_app, delay_multiplier):
 	"""Show an OK_Dialog, Close, and get OK"""
 	# Arrange
 	app = wx_app
@@ -141,7 +141,7 @@ def test_OK_Dialog_with_Close(wx_app):
 	# CallAfter is a function used to schedule a callable to be executed
 	# on the main GUI thread after the current event hander and any
 	# pending event handlers have completed.
-	wx.CallLater(1000 * 4, dialog.Close)
+	wx.CallLater(int(1000 * delay_multiplier), dialog.Close)
 
 	# The ShowModal() method is used to display a dialog box in a
 	# "modal" fashion.  When a modal dialog is shown, it blocks user
@@ -156,7 +156,7 @@ def test_OK_Dialog_with_Close(wx_app):
 	dialog.Destroy()  # request the dialog to self-destruct
 
 
-def test_OK_Cancel_Dialog_with_OK(wx_app):
+def test_OK_Cancel_Dialog_with_OK(wx_app, delay_multiplier):
 	"""Show an OK_Cancel_Dialog, press OK, and get OK."""
 	# Arrange
 	app = wx_app
@@ -175,7 +175,7 @@ def test_OK_Cancel_Dialog_with_OK(wx_app):
 	# CallAfter is a function used to schedule a callable to be executed
 	# on the main GUI thread after the current event hander and any
 	# pending event handlers have completed.
-	wx.CallLater(1000 * 4, click_OK)
+	wx.CallLater(int(1000 * delay_multiplier), click_OK)
 
 	# The ShowModal() method is used to display a dialog box in a
 	# "modal" fashion.  When a modal dialog is shown, it blocks user
@@ -190,7 +190,7 @@ def test_OK_Cancel_Dialog_with_OK(wx_app):
 	dialog.Destroy()  # request the dialog to self-destruct
 
 
-def test_OK_Cancel_Dialog_with_Cancel(wx_app):
+def test_OK_Cancel_Dialog_with_Cancel(wx_app, delay_multiplier):
 	"""Show an OK_Cancel_Dialog, press Cancel, and get Cancel."""
 	# Arrange
 	app = wx_app
@@ -209,7 +209,7 @@ def test_OK_Cancel_Dialog_with_Cancel(wx_app):
 	# CallAfter is a function used to schedule a callable to be executed
 	# on the main GUI thread after the current event hander and any
 	# pending event handlers have completed.
-	wx.CallLater(1000 * 4, click_Cancel)
+	wx.CallLater(int(1000 * delay_multiplier), click_Cancel)
 
 	# The ShowModal() method is used to display a dialog box in a
 	# "modal" fashion.  When a modal dialog is shown, it blocks user
@@ -224,7 +224,7 @@ def test_OK_Cancel_Dialog_with_Cancel(wx_app):
 	dialog.Destroy()  # request the dialog to self-destruct
 
 
-def test_OK_Cancel_Dialog_with_Close(wx_app):
+def test_OK_Cancel_Dialog_with_Close(wx_app, delay_multiplier):
 	"""Show an OK_Cancel_Dialog, Close, and get Cancel (?!)"""
 	# Arrange
 	app = wx_app
@@ -239,7 +239,7 @@ def test_OK_Cancel_Dialog_with_Close(wx_app):
 	# CallAfter is a function used to schedule a callable to be executed
 	# on the main GUI thread after the current event hander and any
 	# pending event handlers have completed.
-	wx.CallLater(1000 * 4, dialog.Close)
+	wx.CallLater(int(1000 * delay_multiplier), dialog.Close)
 
 	# The ShowModal() method is used to display a dialog box in a
 	# "modal" fashion.  When a modal dialog is shown, it blocks user

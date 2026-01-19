@@ -36,17 +36,21 @@ def wx_app():
 	wx.App._instance = None
 
 
-delay = 2000  # msec
-
-
+# Automate clickOK either by (a) using a custom, self- OK-ing subclass
+# of the dialog object, or (b) using wx.CallLater.
+# (c) first patch mywx.OK_Dialog, then patch again to override a custom class variable
+# Hmmm, in the subclass AutoclickOK, how to scale the time delay using
+# delay_multiplier?
 class AutoclickOK(mywx.OK_Dialog):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		# set a delayed click...
-		wx.CallLater(delay, self.click_ok)
+		delay_multiplier = 1.0  # how to parameterize?
+		wx.CallLater(int(1000 * delay_multiplier), self.click_ok)
 	def click_ok(self):
 		click_event = wx.CommandEvent(wx.EVT_BUTTON.typeId, wx.ID_OK)
 		self.ProcessEvent(click_event)
+
 
 def test_dummy():
 	# Arrange
@@ -129,12 +133,16 @@ def test_get_list_of_subdirs(tmp_path):
 
 # def assert_userdata_dirs_are_separate(
 def test_assert_userdata_dirs_are_separate(
-		monkeypatch, tmp_path, wx_app, caplog):
+		monkeypatch, tmp_path, wx_app, caplog, delay_multiplier):
 	"""Violate the assertion by passing in equivalent path1 & path2."""
 
 	# Arrange
-	# Use a custom self- OK-ing subclass of the dialog object.
+
+	# (a) Use a custom self- OK-ing subclass of the dialog object.
 	monkeypatch.setattr(userdata_survey.mywx, 'OK_Dialog', AutoclickOK)
+
+	# monkeypatch.setattr(userdata_survey.mywx.OK_Dialog, 'delay_multiplier', 2)
+	# monkeypatch.setattr(AutoclickOK, 'delay_multiplier', 2)
 
 	# Act
 	with pytest.raises(SystemExit,

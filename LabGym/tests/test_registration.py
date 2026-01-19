@@ -42,7 +42,7 @@ def test_dummy():
 	# Assert not necessary.  This unit test passes unless exception was raised.
 
 
-def test_mydialog_skip(wx_app):
+def test_mydialog_skip(wx_app, delay_multiplier):
 	frame = wx.Frame(None)  # parent for the dialog
 	dialog = registration.RegFormDialog(frame)
 
@@ -55,7 +55,7 @@ def test_mydialog_skip(wx_app):
 	# on the main GUI thread after the current event hander and any
 	# pending event handlers have completed.
 	# wx.CallAfter(click_skip)
-	wx.CallLater(1000, click_skip)
+	wx.CallLater(int(1000 * delay_multiplier), click_skip)  # delay in ms
 
 	# The ShowModal() method is used to display a dialog box in a
 	# "modal" fashion.  When a modal dialog is shown, it blocks user
@@ -70,7 +70,7 @@ def test_mydialog_skip(wx_app):
 	dialog.Destroy()  # request the dialog to self-destruct
 
 
-def test_mydialog_register(wx_app):
+def test_mydialog_register(wx_app, delay_multiplier):
 	frame = wx.Frame(None)  # parent for the dialog
 	dialog = registration.RegFormDialog(frame)
 
@@ -96,10 +96,10 @@ def test_mydialog_register(wx_app):
 	# This allows the dialog to become active before test code attempts
 	# to interact with it.
 	# wx.CallAfter(click_register)
-	wx.CallLater(1000, enter_name)  # delay in ms
-	wx.CallLater(2000, enter_affiliation)  # delay in ms
-	wx.CallLater(3000, enter_email)  # delay in ms
-	wx.CallLater(5000, click_register)  # delay in ms
+	wx.CallLater(int(1000 * delay_multiplier), enter_name)  # delay in ms
+	wx.CallLater(int(2000 * delay_multiplier), enter_affiliation)  # delay in ms
+	wx.CallLater(int(3000 * delay_multiplier), enter_email)  # delay in ms
+	wx.CallLater(int(4000 * delay_multiplier), click_register)  # delay in ms
 
 	# The ShowModal() method is used to display a dialog box in a
 	# "modal" fashion.  When a modal dialog is shown, it blocks user
@@ -114,7 +114,7 @@ def test_mydialog_register(wx_app):
 	dialog.Destroy()  # request the dialog to self-destruct
 
 
-def test__get_reginfo_from_form(monkeypatch, wx_app, tmp_path):
+def test__get_reginfo_from_form(monkeypatch, wx_app, tmp_path, delay_multiplier):
 
 	# frame = wx.Frame(None)  # parent for the dialog
 	# dialog = registration.RegFormDialog(frame)
@@ -145,16 +145,16 @@ def test__get_reginfo_from_form(monkeypatch, wx_app, tmp_path):
 	# wx.CallLater(1000, enter_name, h)  # delay in ms
 	# wx.CallLater(2000, enter_affiliation, h)  # delay in ms
 	# wx.CallLater(3000, enter_email, h)  # delay in ms
-	# wx.CallLater(5000, click_register, h)  # delay in ms
+	# wx.CallLater(4000, click_register, h)  # delay in ms
 
 	monkeypatch.setattr(registration.wx, 'App', lambda: None)
 	h = registration.RegFormDialog(None)
 	monkeypatch.setattr(registration, 'RegFormDialog', lambda arg1: h)
 
-	wx.CallLater(1000, enter_name, h)  # delay in ms
-	wx.CallLater(2000, enter_affiliation, h)  # delay in ms
-	wx.CallLater(3000, enter_email, h)  # delay in ms
-	wx.CallLater(5000, click_register, h)  # delay in ms
+	wx.CallLater(int(1000 * delay_multiplier), enter_name, h)  # delay in ms
+	wx.CallLater(int(2000 * delay_multiplier), enter_affiliation, h)  # delay in ms
+	wx.CallLater(int(3000 * delay_multiplier), enter_email, h)  # delay in ms
+	wx.CallLater(int(4000 * delay_multiplier), click_register, h)  # delay in ms
 
 	# this works, but why not run registration itself?
 	# reginfo = registration._get_reginfo_from_form()
