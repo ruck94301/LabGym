@@ -18,6 +18,7 @@ from .exitstatus import exitstatus
 # testdir = Path(__file__[:-3])  # dir containing support files for unit tests
 # assert testdir.is_dir()
 
+
 @pytest.fixture(scope="module")  # invoke once in the test module
 def wx_app():
 	# setup logic
@@ -36,20 +37,19 @@ def wx_app():
 	wx.App._instance = None
 
 
-# Automate clickOK either by (a) using a custom, self- OK-ing subclass
-# of the dialog object, or (b) using wx.CallLater.
-# (c) first patch mywx.OK_Dialog, then patch again to override a custom class variable
-# Hmmm, in the subclass AutoclickOK, how to scale the time delay using
-# delay_multiplier?
-class AutoclickOK(mywx.OK_Dialog):
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		# set a delayed click...
-		delay_multiplier = 1.0  # how to parameterize?
-		wx.CallLater(int(1000 * delay_multiplier), self.click_ok)
-	def click_ok(self):
-		click_event = wx.CommandEvent(wx.EVT_BUTTON.typeId, wx.ID_OK)
-		self.ProcessEvent(click_event)
+@pytest.fixture
+def patch_OK_Dialog_with_autoclickok(monkeypatch, delay_multiplier):
+	"""Patch mywx.OK_Dialog with a subclass that autoclicks OK."""
+	class AutoclickOK(mywx.OK_Dialog):
+		def __init__(self, *args, **kwargs):
+			super().__init__(*args, **kwargs)
+			delay = int(1000 * delay_multiplier)  # default 1000 ms
+			wx.CallLater(delay, self.click_ok)
+		def click_ok(self):
+			click_event = wx.CommandEvent(wx.EVT_BUTTON.typeId, wx.ID_OK)
+			self.ProcessEvent(click_event)
+
+	monkeypatch.setattr(userdata_survey.mywx, 'OK_Dialog', AutoclickOK)
 
 
 def test_dummy():
@@ -60,7 +60,6 @@ def test_dummy():
 
 
 def test_is_path_under():
-
 	# path1 and path2 are equivalent
 	assert userdata_survey.is_path_under('/a/b', '/a/b') == False
 	assert userdata_survey.is_path_under('/a/b', '/a/b/..') == False
@@ -131,18 +130,14 @@ def test_get_list_of_subdirs(tmp_path):
 	assert result == expected
 
 
-# def assert_userdata_dirs_are_separate(
 def test_assert_userdata_dirs_are_separate(
-		monkeypatch, tmp_path, wx_app, caplog, delay_multiplier):
+		monkeypatch, tmp_path, wx_app, caplog,
+		# Patch mywx.OK_Dialog with a subclass that autoclicks OK
+		patch_OK_Dialog_with_autoclickok,
+		):
 	"""Violate the assertion by passing in equivalent path1 & path2."""
 
 	# Arrange
-
-	# (a) Use a custom self- OK-ing subclass of the dialog object.
-	monkeypatch.setattr(userdata_survey.mywx, 'OK_Dialog', AutoclickOK)
-
-	# monkeypatch.setattr(userdata_survey.mywx.OK_Dialog, 'delay_multiplier', 2)
-	# monkeypatch.setattr(AutoclickOK, 'delay_multiplier', 2)
 
 	# Act
 	with pytest.raises(SystemExit,
@@ -161,11 +156,13 @@ def test_assert_userdata_dirs_are_separate(
 
 
 # def survey(
-def test_survey_case1(monkeypatch, tmp_path, wx_app, caplog):
+def test_survey_case1(
+		monkeypatch, tmp_path, wx_app, caplog,
+		# Patch mywx.OK_Dialog with a subclass that autoclicks OK
+		patch_OK_Dialog_with_autoclickok,
+		):
 	"""violate check 1, and get SystemExit."""
 	# Arrange
-	# Use a custom self- OK-ing subclass of the dialog object.
-	monkeypatch.setattr(userdata_survey.mywx, 'OK_Dialog', AutoclickOK)
 	monkeypatch.setattr(userdata_survey.config, 'get_config',
 		lambda: {'enable': {'assess_userdata_folders': True}})
 
@@ -190,11 +187,13 @@ def test_survey_case1(monkeypatch, tmp_path, wx_app, caplog):
 	assert expected_msg in caplog.text
 
 
-def test_survey_case2(monkeypatch, tmp_path, wx_app, caplog):
+def test_survey_case2(
+		monkeypatch, tmp_path, wx_app, caplog,
+		# Patch mywx.OK_Dialog with a subclass that autoclicks OK
+		patch_OK_Dialog_with_autoclickok,
+		):
 	"""violate check 2, and get Warning."""
 	# Arrange
-	# Use a custom self- OK-ing subclass of the dialog object.
-	monkeypatch.setattr(userdata_survey.mywx, 'OK_Dialog', AutoclickOK)
 	monkeypatch.setattr(userdata_survey.config, 'get_config',
 		lambda: {'enable': {'assess_userdata_folders': True}})
 
@@ -212,11 +211,13 @@ def test_survey_case2(monkeypatch, tmp_path, wx_app, caplog):
 	assert expected_msg in caplog.text
 
 
-def test_survey_case3(monkeypatch, tmp_path, wx_app, caplog):
+def test_survey_case3(
+		monkeypatch, tmp_path, wx_app, caplog,
+		# Patch mywx.OK_Dialog with a subclass that autoclicks OK
+		patch_OK_Dialog_with_autoclickok,
+		):
 	"""violate check 3, and get Warning."""
 	# Arrange
-	# Use a custom self- OK-ing subclass of the dialog object.
-	monkeypatch.setattr(userdata_survey.mywx, 'OK_Dialog', AutoclickOK)
 	monkeypatch.setattr(userdata_survey.config, 'get_config',
 		lambda: {'enable': {'assess_userdata_folders': True}})
 
@@ -233,11 +234,13 @@ def test_survey_case3(monkeypatch, tmp_path, wx_app, caplog):
 	assert expected_msg in caplog.text
 
 
-def test_survey_case4(monkeypatch, tmp_path, wx_app, caplog):
+def test_survey_case4(
+		monkeypatch, tmp_path, wx_app, caplog,
+		# Patch mywx.OK_Dialog with a subclass that autoclicks OK
+		patch_OK_Dialog_with_autoclickok,
+		):
 	"""violate check 4, and get Warning."""
 	# Arrange
-	# Use a custom self- OK-ing subclass of the dialog object.
-	monkeypatch.setattr(userdata_survey.mywx, 'OK_Dialog', AutoclickOK)
 	monkeypatch.setattr(userdata_survey.config, 'get_config',
 		lambda: {'enable': {'assess_userdata_folders': True}})
 
