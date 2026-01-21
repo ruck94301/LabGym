@@ -44,11 +44,11 @@ def probes() -> None:
 	"""
 
 	# Get all of the values needed from config.get_config().
-	_config = config.get_config()
+	_config = config.get_config('anonymous', 'enable', 'detectors', 'models')
 	anonymous: bool = _config['anonymous']
 	registration_enable: bool = _config['enable']['registration']
-	detectors_dir = _config['detectors']
-	models_dir = _config['models']
+	detectors_dir: str = _config['detectors']
+	models_dir: str = _config['models']
 	del _config
 
 	# Check for user data in deprecated LabGym/detectors and LabGym/models
