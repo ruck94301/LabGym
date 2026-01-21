@@ -13,6 +13,7 @@ import wx  # wxPython, Cross platform GUI toolkit for Python, "Phoenix" version
 
 from LabGym import userdata_survey
 from .exitstatus import exitstatus
+from .utils import patch_config_dict
 
 
 # testdir = Path(__file__[:-3])  # dir containing support files for unit tests
@@ -163,8 +164,8 @@ def test_survey_case1(
 		):
 	"""violate check 1, and get SystemExit."""
 	# Arrange
-	monkeypatch.setattr(userdata_survey.config, 'get_config',
-		lambda: {'enable': {'assess_userdata_folders': True}})
+	patch_config_dict(monkeypatch,
+		{'enable': {'assess_userdata_folders': True}})
 
 	# prepare args
 	labgym = os.path.join(tmp_path, 'LabGym')
@@ -194,8 +195,8 @@ def test_survey_case2(
 		):
 	"""violate check 2, and get Warning."""
 	# Arrange
-	monkeypatch.setattr(userdata_survey.config, 'get_config',
-		lambda: {'enable': {'assess_userdata_folders': True}})
+	patch_config_dict(monkeypatch,
+		{'enable': {'assess_userdata_folders': True}})
 
 	# prepare args
 	labgym = os.path.join(tmp_path, 'LabGym')
@@ -218,8 +219,8 @@ def test_survey_case3(
 		):
 	"""violate check 3, and get Warning."""
 	# Arrange
-	monkeypatch.setattr(userdata_survey.config, 'get_config',
-		lambda: {'enable': {'assess_userdata_folders': True}})
+	patch_config_dict(monkeypatch,
+		{'enable': {'assess_userdata_folders': True}})
 
 	# prepare args
 	labgym = os.path.join(tmp_path, 'LabGym')
@@ -241,8 +242,8 @@ def test_survey_case4(
 		):
 	"""violate check 4, and get Warning."""
 	# Arrange
-	monkeypatch.setattr(userdata_survey.config, 'get_config',
-		lambda: {'enable': {'assess_userdata_folders': True}})
+	patch_config_dict(monkeypatch,
+		{'enable': {'assess_userdata_folders': True}})
 
 	# prepare args
 	labgym = os.path.join(tmp_path, 'LabGym')

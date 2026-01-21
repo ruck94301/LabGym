@@ -5,6 +5,7 @@ import sys
 import pytest
 
 from LabGym import mylogging
+from .utils import patch_config_dict
 
 
 rootlogger = logging.getLogger()
@@ -36,14 +37,13 @@ def logging_reset(scope='module'):  # invoke once in the test module
 def test_success(monkeypatch, logging_reset):
 	# Arrange
 	rootlogger.setLevel(logging.DEBUG)
-	_config = {
+	config_dict = {
 		'logging_configfiles':
 			[Path(mylogging.__file__).parent.joinpath('logging.yaml')],
 		'logging_configfile': None,
 		'logging_level': 'INFO',
 		}
-	monkeypatch.setattr(mylogging.config, 'get_config', lambda: _config)
-	logging.debug('%s: %r', '_config', _config)
+	patch_config_dict(monkeypatch, config_dict)
 
 	# Act
 	mylogging.configure()
@@ -56,14 +56,13 @@ def test_success(monkeypatch, logging_reset):
 def test_bad_logging_level(monkeypatch, logging_reset):
 	# Arrange
 	rootlogger.setLevel(logging.DEBUG)
-	_config = {
+	config_dict = {
 		'logging_configfiles':
 			[Path(mylogging.__file__).parent.joinpath('logging.yaml')],
 		'logging_configfile': None,
 		'logging_level': 'WALNUT',  # bad value
 		}
-	monkeypatch.setattr(mylogging.config, 'get_config', lambda: _config)
-	logging.debug('%s: %r', '_config', _config)
+	patch_config_dict(monkeypatch, config_dict)
 
 	# Act
 	mylogging.configure()
@@ -77,13 +76,12 @@ def test_bad_logging_level(monkeypatch, logging_reset):
 def test_bad_specific_logging_configfile(monkeypatch, logging_reset):
 	# Arrange
 	rootlogger.setLevel(logging.DEBUG)
-	_config = {
+	config_dict = {
 		'logging_configfiles': [],
 		'logging_configfile': Path('/bravo/charlie.yaml'),
 		# 'logging_level': None,
 		}
-	monkeypatch.setattr(mylogging.config, 'get_config', lambda: _config)
-	logging.debug('%s: %r', '_config', _config)
+	patch_config_dict(monkeypatch, config_dict)
 
 	# Act
 	logrecords = []

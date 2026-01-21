@@ -1,4 +1,3 @@
-import logging
 import os
 from pathlib import Path
 import re
@@ -10,17 +9,16 @@ import pytest  # pytest: simple powerful testing with Python
 
 from LabGym import probes
 from .exitstatus import exitstatus
+from .utils import patch_config_dict
 
 
 testdir = Path(__file__[:-3])  # dir containing support files for unit tests
 assert testdir.is_dir()
 
 
-# basicConfig here isn't effective, maybe pytest has already configured logging?
-# logging.basicConfig(level=logging.DEBUG)
-# so instead, use the root logger's setLevel method
-logging.getLogger().setLevel(logging.DEBUG)
-logger = logging.getLogger(__name__)
+# # so instead, use the root logger's setLevel method
+# logging.getLogger().setLevel(logging.DEBUG)
+# logger = logging.getLogger(__name__)
 
 # the output from this debug statement is not accessible?
 # instead, perform inside a test function.
@@ -33,22 +31,19 @@ logger = logging.getLogger(__name__)
 
 def test_probes(monkeypatch, tmp_path):
 	# Arrange
-	_config = {
+	config_dict = {
 		'anonymous': True,
 		'enable': {'registration': False, 'central_logger': False},
 		}
 
-	# prepare some userdata dirs outside of LabGym, and include in _config.
+	# prepare some userdata dirs outside of LabGym, and update config_dict.
 	_detectors = str(tmp_path / 'detectors')
 	_models = str(tmp_path / 'models')
 	# Path(_detectors).mkdir()
 	# Path(_models).mkdir()
-	_config.update({'detectors': _detectors, 'models': _models})
-	logging.debug('%s: %r', '_config', _config)
+	config_dict.update({'detectors': _detectors, 'models': _models})
 
-	monkeypatch.setattr(probes.config, 'get_config', lambda: _config)
-	logging.debug('%s: %r', '_config', _config)
-	monkeypatch.setattr(probes.central_logging.config, 'get_config', lambda: _config)
+	patch_config_dict(monkeypatch, config_dict)
 
 	monkeypatch.setattr(probes.userdata_survey, 'survey', lambda *args, **kwargs: None)
 

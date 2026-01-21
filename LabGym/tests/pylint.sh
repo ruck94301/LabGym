@@ -111,7 +111,7 @@ case $OP in
     #-------------------------------------------------------------------
         IS_VENV || EXIT "Expected a venv..."
         
-        MARKER=$OUTDIR/marker.tmp.$$
+        MARKER=$OUTDIR/tmp.marker.$$
         touch $MARKER
         # set trap to delete this $MARKER on exit
         

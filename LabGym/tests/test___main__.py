@@ -6,6 +6,9 @@ import sys
 import time
 
 from packaging import version
+# import pytest
+
+from .utils import patch_config_dict
 
 # Deliberately importing __main__ inside test functions instead of here.
 # Why?  Because (1) must patch mylogging.configure before importing
@@ -22,8 +25,6 @@ from packaging import version
 #     import cv2
 #     # if detectron2 isn't loaded yet, don't foul up cv2 on load.
 #     os.environ['DETECTRON2_DISABLE_CV2'] = '0'  # use '0' for False here.
-
-import pytest
 
 
 logger = logging.getLogger(__name__)
@@ -42,12 +43,12 @@ def test_main(monkeypatch):
 	monkeypatch.setattr(__main__.wx, 'GetApp', lambda: None)
 	monkeypatch.setattr(__main__.wx, 'App', lambda: None)
 
-	monkeypatch.setattr(__main__.config, 'get_config', lambda: {'selftest': False})
+	patch_config_dict(monkeypatch, {'selftest': False})
 
 	# Act
 	__main__.main()
 
-	# Assert... not needed.
+	# Assert
 	# This unit test passes if __main__.main doesn't raise an exception.
 
 
@@ -70,12 +71,12 @@ def test_main_current_labgym(monkeypatch):
 	monkeypatch.setattr(__main__.wx, 'GetApp', lambda: None)
 	monkeypatch.setattr(__main__.wx, 'App', lambda: None)
 
-	monkeypatch.setattr(__main__.config, 'get_config', lambda: {'selftest': False})
+	patch_config_dict(monkeypatch, {'selftest': False})
 
 	# Act
 	__main__.main()
 
-	# Assert... not needed.
+	# Assert
 	# This unit test passes if __main__.main doesn't raise an exception.
 
 
@@ -98,12 +99,12 @@ def test_main_stale_labgym(monkeypatch):
 	monkeypatch.setattr(__main__.wx, 'GetApp', lambda: None)
 	monkeypatch.setattr(__main__.wx, 'App', lambda: None)
 
-	monkeypatch.setattr(__main__.config, 'get_config', lambda: {'selftest': False})
+	patch_config_dict(monkeypatch, {'selftest': False})
 
 	# Act
 	__main__.main()
 
-	# Assert... not needed.
+	# Assert
 	# This unit test passes if __main__.main doesn't raise an exception.
 
 

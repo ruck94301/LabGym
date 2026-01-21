@@ -6,11 +6,11 @@ import sys
 import time
 
 import pytest  # pytest: simple powerful testing with Python
-
 from LabGym import mywx  # on load, monkeypatch wx.App to be a singleton
 import wx  # wxPython, Cross platform GUI toolkit for Python, "Phoenix" version
 
 from LabGym import registration
+from .utils import patch_config_dict
 
 
 testdir = Path(__file__[:-3])  # dir containing support files for unit tests
@@ -158,11 +158,7 @@ def test__get_reginfo_from_form(monkeypatch, wx_app, tmp_path, delay_multiplier)
 
 	# this works, but why not run registration itself?
 	# reginfo = registration._get_reginfo_from_form()
-	_config = {
-		'configdir': tmp_path,
-		}
-	monkeypatch.setattr(registration.config, 'get_config', lambda: _config)
-	logging.debug('%s: %r', '_config', _config)
+	patch_config_dict(monkeypatch, {'configdir': tmp_path})
 
 	registration.register(logging.getLogger())
 
@@ -181,11 +177,7 @@ def test__get_reginfo_from_form(monkeypatch, wx_app, tmp_path, delay_multiplier)
 
 def test_get_reginfo_from_file(monkeypatch):
 	# Arrange
-	_config = {
-		'configdir': testdir,
-		}
-	monkeypatch.setattr(registration.config, 'get_config', lambda: _config)
-	logging.debug('%s: %r', '_config', _config)
+	patch_config_dict(monkeypatch, {'configdir': testdir})
 
 	# Act
 	result = registration.get_reginfo_from_file()
@@ -195,11 +187,7 @@ def test_get_reginfo_from_file(monkeypatch):
 
 def test_is_registered(monkeypatch, tmp_path):
 	# Arrange
-	_config = {
-		'configdir': tmp_path,
-		}
-	monkeypatch.setattr(registration.config, 'get_config', lambda: _config)
-	logging.debug('%s: %r', '_config', _config)
+	patch_config_dict(monkeypatch, {'configdir': tmp_path})
 
 	# Act
 	result = registration.is_registered()
@@ -223,13 +211,11 @@ logging.getLogger().setLevel(logging.DEBUG)
 
 def x_test_probes(monkeypatch):
 	# Arrange
-	_config = {
+	config_dict = {
 		'anonymous': True,
 		'enable': {'registration': False, 'central_logger': False},
 		}
-	monkeypatch.setattr(probes.config, 'get_config', lambda: _config)
-	logging.debug('%s: %r', '_config', _config)
-	monkeypatch.setattr(probes.central_logging.config, 'get_config', lambda: _config)
+	patch_config_dict(monkeypatch, config_dict)
 
 	# Act
 	probes.probes()
