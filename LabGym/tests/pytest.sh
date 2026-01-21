@@ -39,7 +39,7 @@
 
 source INIT.sh
 
-IS_VENV || { EXIT "Expected a venv..."; }
+IS_VENV || EXIT "Expected a venv..."
 
 export PYTHONPATH=
 DEBUG "%s: %s" "\$PYTHONPATH" "$PYTHONPATH"
