@@ -5,141 +5,150 @@
 #  *  writes resultant report-files under tmp.pylint
 #
 # Examples
-#   # Run pylint with custom options on ../*.py and subpackage py-files.
+#   # Run pylint with custom options on package py-files, and summarize.
 #   sh pylint.sh
 #
-#   # Run pylint with custom options on two py-files and a (sub)package.
+#   # Run pylint with custom options on two py-files and a (sub)package, 
+#   # and summarize.
 #   sh pylint.sh ../categorizer.py ../detector.py ../mywx
 #
-#   # Don't run pylint... just summarize existing results in tmp.pylint.
-#   sh pylint.sh --summarize
+#   # Don't run pylint... just summarize cached results in tmp.pylint.
+#   sh pylint.sh --summarize_cached_results
 
+# Initialize
 source INIT.sh
 
-LIST_SUBPACKAGES () {
-    find .. -mindepth 1 -maxdepth 1 -type d -print |
+LIST_PACKAGES () {
+    local D
+    find .. -maxdepth 1 -type d -print |
     egrep -v "^\.\./(detectors|models|detectron2|tests)$" |
     while read D; do
         [ -f "$D"/__init__.py ] && echo "$D"
     done
 }
 
-PYFILES=$({ echo ../*.py
-    for P in $(LIST_SUBPACKAGES); do echo $P/*.py; done
-    } | sed "s/ /\n/g" | sort)
+SUMMARIZE_FILE () {
+    # summarize a pylint output
+    AWK -F: '
+        BEGIN {
+            OFS = "\t"
+            count = 0
+        }
 
+        NF >= 5 {
+            # count lines with 5 ":" -separated fields as pylint observations
+            count += 1
+            next
+        }
+
+        /^Your code has been rated at/ {
+            # pylint output is completed
+
+            split($0, tokens, " ")
+            rating = tokens[7]
+
+            print rating, count
+            next
+        }
+
+        {
+            # disregard line separators
+            if ($0 ~ /^$/) {next}
+            else if ($0 ~ /^--------/) {next}
+            else if ($0 ~ /^\*\*\*\*\*\*\*\*/) {next}
+            else {
+                print "unexpected format: " $0 > "/dev/stderr"
+            }
+        }
+    '
+}
+
+SUMMARIZE_FILES () {
+    local F NAME
+    while read F; do
+        NAME=$(expr "$F" : ".*/pylint.\(.*\).out")
+        printf "%s\t%s\n" "$(SUMMARIZE_FILE < "$F")" "$NAME"
+    done |
+    expand -10,16 |
+    cat -n
+}
+
+OUTDIR=tmp.pylint
+
+# Parse args
 OP=pylint  # default OP
 while [ $# -gt 0 ]; do
     case $1 in
-        --summarize)  OP=summarize; shift;;
+        --summarize_cached_results)  OP=summarize_cached_results; shift;;
+
         --)  shift; break;;
-        -*)  ERROR "Bad usage.  Unsupported option ($1)"; exit 1;;
+        -*)  EXIT "Bad usage.  Unsupported option ($1)";;
         *)  break;;
     esac
 done
 
 case $OP in
     pylint)
-#-----------------------------------------------------------------------
-if [ $# -gt 0 ]; then
-    PYFILES=$*
-fi
+        if [ $# -gt 0 ]; then
+            PYFILES=$*
+        else
+            PYFILES=$(for P in $(LIST_PACKAGES); do 
+                    printf "%s\n" $P/*.py
+                done | sort)
+        fi
+        DEBUG "%s: %s" "\$PYFILES" "$PYFILES"
+    ;;
+    summarize_cached_results)  
+        [ $# -eq 0 ] || EXIT "Bad usage.  (\$#: $#)"
+    ;;
+    *)  EXIT "Impossible.  (\$OP: $OP)";;
+esac
 
-DEBUG "%s: %s" "\$PYFILES" "$PYFILES"
-
-IS_VENV || { ERROR "Expected a venv..."; exit 1; }
-
-OUTDIR=tmp.pylint
-
-OPTS="--rcfile pylintrc"
-
-# # Disable invalid-name.
-# OPTS="$OPTS${OPTS:+ }--disable=invalid-name"
-# --disable=invalid-name is now represented in pylintrc, so removed here.
-
-setopt SH_WORD_SPLIT 2> /dev/null
-
-for F in $PYFILES; do
-    # echo $F; continue
-
-    OUTFILE=$OUTDIR/pylint.$(echo $F | tr / . | sed "s/^\.\.\.//").out
-
-    # (set -x; pylint $OPTS $F > $OUTFILE)
-    printf "%s\n" "+ pylint $OPTS $F > $OUTFILE"
-    pylint $OPTS $F > $OUTFILE
-
-    grep -n "^Your code has been rated " $OUTFILE
-done
-#-----------------------------------------------------------------------
+# Operate
+case $OP in
+    #-------------------------------------------------------------------
+    pylint)
+    #-------------------------------------------------------------------
+        IS_VENV || EXIT "Expected a venv..."
+        
+        MARKER=$OUTDIR/marker.tmp.$$
+        touch $MARKER
+        # set trap to delete this $MARKER on exit
+        
+        OPTS="--rcfile pylintrc"
+        
+        setopt SH_WORD_SPLIT 2> /dev/null
+        
+        for F in $PYFILES; do
+            OUTFILE=$OUTDIR/pylint.$(echo $F | tr / . | sed "s/^\.\.\.//").out
+        
+            # (set -x; pylint $OPTS $F > $OUTFILE)
+            printf "%s\n" "+ pylint $OPTS $F > $OUTFILE" >& 2
+            pylint $OPTS $F > $OUTFILE
+        
+            < $OUTFILE grep -n "^Your code has been rated "
+        done
+        
+        # (assumes this is the only process writing into $OUTDIR)
+        find $OUTDIR -newer $MARKER -type f -name "pylint.*.out" -print |
+        sort |
+        SUMMARIZE_FILES
+        
+        rm $MARKER
     ;;
 
-    summarize)
-#-----------------------------------------------------------------------
-# Don't run pylint... 
-# Summarize existing pylint report files stored under tmp.pylint.
-
-[ $# -eq 0 ] || { ERROR "Bad usage.  \$#: $#"; exit 1; }
-
-# (cd tmp.pylint && grep -n "Your code has been rated at" *.out) |
-#
-# sed \
-#     -e "s/^pylint\.//" \
-#     -e "s/ (previous run: .*//" \
-#     -e "s/\(.*.py\).out:\([0-9]*\):/\1\t\2\t/" \
-#     -e "s/Your code has been rated at //" |
-#
-# # print rating, number of messages (assuming N-3), filename
-# AWK -F"\t" 'BEGIN {OFS = "\t"}; {print $3, $2-3, $1}' |
-
-(
-    set -e
-    cd tmp.pylint
-    for F in *.out; do
-        AWK -F: '
-            BEGIN {
-                OFS = "\t"
-                count = 0
-            }
-
-            NF >= 5 {
-                # lines with 5 ":"-separated fields are pylint "observations"
-                count += 1
-                next
-            }
-
-            /^Your code has been rated at/ {
-                # pylint output is completed
-
-                split($0, tokens, " ")
-                rating = tokens[7]
-
-                buf = FILENAME
-                sub("^pylint\.", "", buf)
-                sub("\.out$", "", buf)
-
-                print rating, count, buf
-                next
-            }
-
-            {
-                # disregard line separators
-                if ($0 ~ /^$/) {next}
-                else if ($0 ~ /^--------/) {next}
-                else if ($0 ~ /^\*\*\*\*\*\*\*\*/) {next}
-                else {
-                    print "unexpected: " $0
-                }
-            }
-            ' $F
-    done
-) |
-
-expand -10,16 |
-cat -n
-#-----------------------------------------------------------------------
+    #-------------------------------------------------------------------
+    summarize_cached_results)
+    #-------------------------------------------------------------------
+        # Don't run pylint... 
+        # Summarize existing pylint report files stored under tmp.pylint.
+        
+        find $OUTDIR -type f -name "pylint.*.out" -print |
+        sort |
+        SUMMARIZE_FILES
     ;;
 
-    *)  { ERROR "Impossible.  \$OP: $OP"; exit 1; };;
+    *)  EXIT "Impossible.  (\$OP: $OP)";;
 esac
 
 exit $?
