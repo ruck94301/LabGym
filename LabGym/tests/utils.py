@@ -22,6 +22,16 @@ outer wrapper (get_config) intact (:
 
 """
 
+def myraise(e):
+	"""Raise exception.  This helper function form is useful in a lambda."""
+	raise e
+
+
+def raise_valueerror(msg):
+	"""Raise ValueError.  This helper function form is useful in a lambda."""
+	raise ValueError(msg)
+
+
 def patch_config_dict(mp, data_dict):
 	"""Patch the dict returned by config.get_fullconfig.
 
