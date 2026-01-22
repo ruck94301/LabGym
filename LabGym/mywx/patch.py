@@ -12,6 +12,7 @@ from __future__ import annotations
 import logging
 import sys
 import textwrap
+from typing import Any, Type, TypeVar
 
 # Log the load of this module (by the module loader, on first import).
 # Intentionally positioning these statements before other imports, against the
@@ -64,10 +65,12 @@ except AssertionError as e:
 #             wx.mywx_AppCount += 1
 
 
+T = TypeVar('T', bound='StrictSingleton')
+
 class StrictSingleton(wx.App):
 	_instance = None  # Class variable to hold the single instance
 
-	def __new__(cls, *args, **kwargs):
+	def __new__(cls: type[T], *args: Any, **kwargs: Any) -> T:
 		logger.debug('patched __new__ -- entered')
 		if cls._instance is None:
 			logger.debug('patched __new__ -- instantiating')
@@ -75,11 +78,17 @@ class StrictSingleton(wx.App):
 		else:
 			raise AssertionError('wx.App() is called once at most.')
 		logger.debug(f'patched __new__ -- returning {cls._instance}')
-		wx.mywx_AppCount += 1
+		# mypy: Module has no attribute "mywx_AppCount"  [attr-defined]
+		wx.mywx_AppCount += 1  # type: ignore
 		return cls._instance
 
 
 if not patched:
 	# monkeypatch wx.App
-	wx.mywx_AppCount = 0
-	wx.App = StrictSingleton
+
+	# mypy: error: Module has no attribute "mywx_AppCount"  [attr-defined]
+	wx.mywx_AppCount = 0  # type: ignore
+
+	# mypy: error: Cannot assign to a type  [misc]
+	wx.App = StrictSingleton  # type: ignore
+	# setattr(wx, "App", StrictSingleton)

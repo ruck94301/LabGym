@@ -26,7 +26,7 @@ logger.debug('%s', f'loading {__name__}')
 if sys.platform == 'darwin':  # macOS
 	# AppKit is from package pyobjc-framework-Cocoa, "Wrappers for the
 	# Cocoa frameworks on macOS".
-	from AppKit import NSApp, NSApplication
+	from AppKit import NSApp, NSApplication  # type: ignore
 
 import wx  # wxPython, Cross platform GUI toolkit for Python, "Phoenix" version
 
@@ -74,7 +74,12 @@ class OK_Dialog(wx.Dialog):
 	(class purpose and functionality, and optionally its attributes and methods)
 	"""
 
-	def __init__(self, parent, title='', msg=''):
+	def __init__(
+		self,
+		parent: wx.Window | None,
+		title: str = '',
+		msg: str = '',
+	) -> None:
 		super().__init__(parent, title=title)
 
 		panel = wx.Panel(self)
@@ -107,7 +112,11 @@ class OK_Dialog(wx.Dialog):
 		main_sizer.Fit(self)
 		# self.SetSizerAndFit(main_sizer)  # is this equivalent??
 
-	def add_buttons(self, panel, button_sizer):
+	def add_buttons(
+		self,
+		panel: wx.Panel,
+		button_sizer: wx.StdDialogButtonSizer,
+	) -> None:
 		"""Create and add buttons to sizers, and bind event handlers.
 
 		Create standard buttons with their respective IDs.
@@ -119,7 +128,7 @@ class OK_Dialog(wx.Dialog):
 		button_sizer.AddButton(ok_button)
 		self.Bind(wx.EVT_BUTTON, self.on_ok, id=wx.ID_OK)
 
-	def on_ok(self, event):
+	def on_ok(self, event: wx.CommandEvent) -> None:
 		"""End the modal state of this dialog object."""
 		self.EndModal(wx.ID_OK)
 
@@ -127,7 +136,11 @@ class OK_Dialog(wx.Dialog):
 class OK_Cancel_Dialog(OK_Dialog):
 	"""An OK/Cancel dialog object, with the message text left-aligned."""
 
-	def add_buttons(self, panel, button_sizer):
+	def add_buttons(
+		self,
+		panel: wx.Panel,
+		button_sizer: wx.StdDialogButtonSizer,
+	) -> None:
 		# Create/Add/Bind for the OK button
 		super().add_buttons(panel, button_sizer)
 
@@ -136,6 +149,6 @@ class OK_Cancel_Dialog(OK_Dialog):
 		button_sizer.AddButton(cancel_button)
 		self.Bind(wx.EVT_BUTTON, self.on_cancel, id=wx.ID_CANCEL)
 
-	def on_cancel(self, event):
+	def on_cancel(self, event: wx.CommandEvent) -> None:
 		"""End the modal state of this dialog object."""
 		self.EndModal(wx.ID_CANCEL)
