@@ -27,12 +27,12 @@ import wx
 from LabGym import mywx
 
 
-def fmt(s):
+def fmt(s: str) -> str:
 	"""Format a multi-line string."""
 	return textwrap.dedent(s).strip()
 
 
-def run_selftests_help():
+def run_selftests_help() -> None:
 	"""Display Help to a wx.Dialog."""
 	title = 'How to run LabGym selftests'
 	msg = fmt(f"""
@@ -55,6 +55,7 @@ def run_selftests_help():
 
 	logger.info(msg)
 	with mywx.OK_Cancel_Dialog(None, title=title, msg=msg) as dlg:
+		assert dlg is not None  # for mypy
 		result = dlg.ShowModal()
 
 	if result == wx.ID_OK:
@@ -65,7 +66,7 @@ def run_selftests_help():
 		raise Exception('Impossible')
 
 
-def run_selftests():
+def run_selftests() -> int:
 	"""Run pytest ..."""
 
 	exit_codes = []
@@ -131,7 +132,7 @@ def run_selftests():
 	return result
 
 
-def test_dummy():
+def test_dummy() -> None:
 	# Arrange
 	# Act
 	pass
