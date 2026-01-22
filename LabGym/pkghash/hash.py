@@ -11,6 +11,7 @@ Public Functions
 from __future__ import annotations
 
 # Standard library imports.
+from collections.abc import Iterator
 from contextlib import contextmanager
 import hashlib
 import itertools
@@ -20,6 +21,7 @@ from pathlib import Path
 import re
 import sys
 import time
+from typing import TextIO
 
 # Related third party imports.
 # None
@@ -30,13 +32,13 @@ import time
 
 logger = logging.getLogger(__name__)
 
-_cached_hashvals = {}
+_cached_hashvals: dict[Path, str] = {}
 
 
 # from contextlib import chdir  # available in Python 3.11+
 # To support earlier Python, implement chdir
 @contextmanager
-def chdir(path):
+def chdir(path: str|Path) -> Iterator[None]:
 	"""Temporarily chdir."""
 	old_cwd = os.getcwd()
 	try:
@@ -122,7 +124,7 @@ def _walk_and_hash(folder: Path) -> str:
 	return hashval
 
 
-def _add_file_to_hash(hasher, file_path: str) -> None:
+def _add_file_to_hash(hasher: hashlib._Hash, file_path: str) -> None:
 	"""Add the filepath and the file content to the hash.
 
 	Hash is sensitive to
@@ -163,7 +165,7 @@ def _add_file_to_hash(hasher, file_path: str) -> None:
 		(filename, hasher.hexdigest()))
 
 
-def _myreadlines(f, n=200):
+def _myreadlines(f: TextIO, n:int=200) -> Iterator[list[str]]:
 	"""Read n lines from f, and yield a list of the n strings."""
 	while True:
 		nline_chunk = list(itertools.islice(f, n))
@@ -172,7 +174,7 @@ def _myreadlines(f, n=200):
 		yield nline_chunk
 
 
-def _expand(line, n=4):
+def _expand(line: str, n:int=4) -> str:
 	"""Expand leading tabs to n spaces."""
 	match = re.match(r'^(\t+)', line)
 	if match:
