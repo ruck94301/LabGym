@@ -35,10 +35,15 @@ import sys
 
 
 # This module replaces the genuine pkg_resources package.
-sys.modules['pkg_resources'] = sys.modules.get(__name__)
+# sys.modules['pkg_resources'] = sys.modules.get(__name__)
+sys.modules['pkg_resources'] = sys.modules[__name__]
 
 
-def resource_filename(*args):
+# def resource_filename(*args: str) -> str:
+def resource_filename(
+	package_or_requirement: str,  # | Requirement
+	resource_name: str,
+) -> str:
 	"""Emulate the pkg_resources.resource_filename function.
 
 	(from Google AI Overview)
@@ -74,7 +79,7 @@ def resource_filename(*args):
 	direct path to the resource within that directory.
 	"""
 
-	assert len(args) == 2
-
 	# re-implement with importlib.resources.files()
-	return str(importlib.resources.files(args[0]) / args[1])
+	return str(
+		importlib.resources.files(package_or_requirement) / resource_name
+		)

@@ -26,7 +26,8 @@ logger.debug('%s: %r', '(__name__, __package__)', (__name__, __package__))
 # Related third party imports.
 import certifi  # Python package for providing Mozilla's CA Bundle.
 import requests  # Python HTTP for Humans.
-import packaging  # Core utilities for Python packages
+# import packaging  # Core utilities for Python packages
+import packaging.version  # more specific, for mypy
 
 # Local application/library specific imports.
 from LabGym import __version__, pkghash

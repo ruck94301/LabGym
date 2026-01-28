@@ -51,7 +51,7 @@ version = LabGym.__version__
 def labgym_version_with_hash() -> str:
 	"""Return a hash-embellished version string for LabGym."""
 
-	hashval: str = get_hashval(labgym_package_folder)
+	hashval = get_hashval(labgym_package_folder)
 
 	version_with_longhash = f'{version} ({hashval})'
 	logger.debug('%s: %r', 'version_with_longhash', version_with_longhash)

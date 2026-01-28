@@ -15,7 +15,7 @@ Public functions
 		is_path_equivalent(path1: str|Path, path2: str|Path) -> bool
 		resolve(path1: str|Path) -> str
 		dict2str(arg: dict, hanging_indent: str=' '*16) -> str
-		get_list_of_subdirs(parent_dir: str|Path) -> List[str]
+		get_list_of_subdirs(parent_dir: str|Path) -> list[str]
 
 Public classes: None
 
@@ -132,7 +132,7 @@ def dict2str(arg: dict, hanging_indent: str=' '*16) -> str:
 	return result
 
 
-def get_list_of_subdirs(parent_dir: str|Path) -> List[str]:
+def get_list_of_subdirs(parent_dir: str|Path) -> list[str]:
 	"""Return a sorted list of strings of the names of the child dirs.
 
 	... excluding __pycache__.
@@ -192,6 +192,7 @@ def assert_userdata_dirs_are_separate(
 
 		# Show the error msg with an OK_Dialog.
 		with mywx.OK_Dialog(None, title=title, msg=msg) as dlg:
+			assert dlg is not None  # for mypy
 			result = dlg.ShowModal()  # will return wx.ID_OK upon OK or dismiss
 
 		sys.exit('Bad configuration')
@@ -284,6 +285,7 @@ def survey(
 
 		# Show the warning msg with an OK_Dialog.
 		with mywx.OK_Dialog(None, title=title, msg=textwrap.fill(msg)) as dlg:
+			assert dlg is not None  # for mypy
 			result = dlg.ShowModal()  # will return wx.ID_OK upon OK or dismiss
 
 	# 3.  If any userdata dirs are configured as located within the
@@ -303,6 +305,7 @@ def survey(
 
 		# Show the warning msg with an OK_Dialog.
 		with mywx.OK_Dialog(None, title=title, msg=textwrap.fill(msg)) as dlg:
+			assert dlg is not None  # for mypy
 			result = dlg.ShowModal()  # will return wx.ID_OK upon OK or dismiss
 
 	# 4.  For any userdata dirs configured as external to LabGym tree,
@@ -333,4 +336,5 @@ def survey(
 
 		# Show the warning msg with an OK_Dialog.
 		with mywx.OK_Dialog(None, title=title, msg=textwrap.fill(msg)) as dlg:
+			assert dlg is not None  # for mypy
 			result = dlg.ShowModal()  # will return wx.ID_OK upon OK or dismiss

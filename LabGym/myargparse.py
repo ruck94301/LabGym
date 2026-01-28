@@ -19,8 +19,8 @@ from __future__ import annotations
 import os
 import sys
 import textwrap
-# from typing import Any, Dict, List, Union
-from typing import Dict, List, Union
+# from typing import Any, Dict, Union
+from typing import Dict, Union
 
 
 # Related third party imports.
@@ -35,8 +35,8 @@ from LabGym import __version__, pkghash
 ResultType = Dict[str, Union[
 	# Path,  # configdir, configfile, logging_configfile (specific)
 	str,  # configdir, configfile, logging_configfile (specific)
-	# List[Path], # logging_configfiles (potentials)
-	List[str], # logging_configfiles (potentials)
+	# list[Path], # logging_configfiles (potentials)
+	list[str], # logging_configfiles (potentials)
 	str,  # logging_level
 	bool,  # anonymous
 	Dict[str, bool],  # enable
@@ -143,13 +143,15 @@ def parse_args() -> ResultType:
 		elif arg in ['--enable']:
 			if result.get('enable') is None:
 				 result['enable'] = {}
-			result.get('enable').update({args[1]: True})
+			assert isinstance(result['enable'], dict)  # for mypy
+			result['enable'].update({args[1]: True})
 			args = args[2:]  # shift 2
 
 		elif arg in ['--disable']:
 			if result.get('enable') is None:
 				 result['enable'] = {}
-			result.get('enable').update({args[1]: False})
+			assert isinstance(result['enable'], dict)  # for mypy
+			result['enable'].update({args[1]: False})
 			args = args[2:]  # shift 2
 
 		elif arg in ['--logging_configfile']:

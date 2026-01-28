@@ -113,7 +113,7 @@ try:
 	import tomllib  # type: ignore
 except ModuleNotFoundError:
 	import tomli as tomllib  # A lil' TOML parser
-from typing import Dict, List
+from typing import Dict
 
 # Related third party imports.
 import yaml  # PyYAML, YAML parser and emitter for Python
@@ -250,7 +250,7 @@ def configure() -> None:
 
 		# (1) Get all of the values needed from config.get_config().
 		_config = config.get_config()
-		logging_configfiles: List[Path] = _config['logging_configfiles']
+		logging_configfiles: list[Path] = _config['logging_configfiles']
 		logging_configfile: Path|None = _config.get('logging_configfile')
 		logging_level: str|None = _config.get('logging_level')
 
@@ -311,7 +311,7 @@ def configure() -> None:
 	_handle(logrecords)
 
 
-def _handle(logrecords: List[logging.LogRecord]) -> None:
+def _handle(logrecords: list[logging.LogRecord]) -> None:
 	"""For each collected/deferred logrecord, have its named logger handle it.
 
 	Now, presumably the python logging system has been configured, so
