@@ -137,7 +137,7 @@ def get_config_from_configfile(configfile: Path) -> dict:
 	return result
 
 
-def get_config(*args) -> dict:
+def get_config(*args: str) -> dict:
 	"""Return a copy of the cached config dict (or a subset of its pairs).
 
 	If args are passed, then return a new dict of only those keys and

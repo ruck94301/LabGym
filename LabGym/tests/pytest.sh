@@ -4,6 +4,18 @@
 #  *  expects to be run from LabGym/tests
 # 
 # Examples
+#     PROJECT=~/LabGymRepo  # The LabGym-repo-dir or LabGym-project-dir.
+#     LABGYM=$PROJECT/LabGym  # The package-dir
+#
+#   This discovers 59 tests from the project-dir.
+#     (cd $PROJECT && pytest --collect-only --ignore-glob="**tmp.gitignore")
+#
+#   This discovers 54 tests from the LabGym-package-dir.
+#     (cd $LABGYM && pytest --collect-only --ignore-glob="**tmp.gitignore")
+
+
+
+#     (cd pytest --ignore-glob="*/tmp.gitignore"
 #     sh pytest.sh -m "not marker_wxapp" --multiplier=0.2 --ignore-glob="tmp*"
 #
 #     # Run the tests in this dir.
